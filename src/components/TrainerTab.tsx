@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ActionType, Card, HandAttempt, Position, SpotCategory, SpotDefinition } from '../types/poker';
-import { SPOT_DEFINITIONS, getSpotById } from '../data/gtoRanges';
-import { classifyHandType, dealCardsForNotation, evaluateUserAction, formatPositionLabel, getAll169Hands, getOptimalAction } from '../utils/pokerUtils';
+import { ActionType, Card, HandAttempt, Position, SpotDefinition } from '../types/poker';
+import { SPOT_DEFINITIONS } from '../data/gtoRanges';
+import { classifyHandType, dealCardsForNotation, evaluateUserAction, formatPositionLabel, getAll169Hands } from '../utils/pokerUtils';
 import { sounds } from '../utils/soundEffects';
 import { PokerTable } from './PokerTable';
 import { PlayingCard } from './PlayingCard';
 import { MorphologyExplanation } from './MorphologyExplanation';
 import { RangeGrid } from './RangeGrid';
-import { Filter, RefreshCw, Sparkles, Layers, ShieldAlert } from 'lucide-react';
+import { Filter, RefreshCw, ShieldAlert } from 'lucide-react';
 
 interface TrainerTabProps {
   onRecordAttempt: (attempt: HandAttempt) => void;
@@ -29,7 +29,6 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
     message: string;
   } | null>(null);
 
-  // Generate a fresh random hand spot
   const generateNewHand = useCallback(() => {
     let availableSpots = SPOT_DEFINITIONS;
 
@@ -58,14 +57,12 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
     sounds.playCardDeal();
   }, [selectedSpotId, selectedCategory, leakPosition]);
 
-  // Initial hand generation on mount
   useEffect(() => {
     generateNewHand();
   }, [generateNewHand]);
 
-  // Handle user pick
   const handleActionPick = (action: ActionType) => {
-    if (userAction !== null) return; // already answered
+    if (userAction !== null) return;
 
     const freq = currentSpot.ranges[handNotation] || { fold: 1, call: 0, raise: 0 };
     const evalResult = evaluateUserAction(action, freq);
@@ -79,7 +76,6 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
       sounds.playIncorrect();
     }
 
-    // Record attempt for stats tracking
     const handType = classifyHandType(handNotation);
     const attempt: HandAttempt = {
       id: Math.random().toString(36).substring(2, 9),
@@ -100,7 +96,6 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
     onRecordAttempt(attempt);
   };
 
-  // Keyboard shortcut listener (1: Fold, 2: Call, 3: Raise, Space: Next)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
@@ -124,13 +119,13 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const freq = currentSpot.ranges[handNotation] || { fold: 1, call: 0, raise: 0 };
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6">
+    <div className="w-full max-w-5xl mx-auto space-y-5">
       
-      {/* Controls & Filter Bar */}
-      <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 shadow-lg">
+      {/* M3 Surface Controls Bar */}
+      <div className="bg-m3-surfaceContainerLow border border-m3-outlineVariant/40 p-4 rounded-m3-xl flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
-            <Filter className="w-4 h-4 text-emerald-400" />
+          <div className="flex items-center gap-2 text-xs font-semibold text-m3-onSurfaceVariant uppercase tracking-wider">
+            <Filter className="w-4 h-4 text-m3-primary" />
             <span>Spot Selector</span>
           </div>
 
@@ -140,7 +135,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               setSelectedSpotId(e.target.value);
               setSelectedCategory('all');
             }}
-            className="bg-slate-950 text-slate-100 border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="bg-m3-surfaceContainerHigh text-m3-onSurface border border-m3-outlineVariant/50 rounded-m3-md px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-m3-primary"
           >
             <option value="all">🎲 All Spots (Random)</option>
             {SPOT_DEFINITIONS.map(s => (
@@ -154,16 +149,16 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               setSelectedCategory(e.target.value);
               setSelectedSpotId('all');
             }}
-            className="bg-slate-950 text-slate-100 border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="bg-m3-surfaceContainerHigh text-m3-onSurface border border-m3-outlineVariant/50 rounded-m3-md px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-m3-primary"
           >
-            <option value="all">All Spot Types</option>
+            <option value="all">All Spot Categories</option>
             <option value="rfi">Open Raise (RFI)</option>
             <option value="facing_open">Facing Open Raise</option>
             <option value="facing_3bet">Facing 3-Bet</option>
           </select>
 
           {leakPosition && (
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-950/60 border border-amber-500/40 rounded-xl text-xs font-bold text-amber-300 animate-pulse">
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-950/60 border border-amber-500/40 rounded-m3-full text-xs font-semibold text-amber-300">
               <ShieldAlert className="w-3.5 h-3.5" />
               <span>Targeting Leak: {leakPosition}</span>
             </div>
@@ -172,20 +167,19 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
 
         <button
           onClick={generateNewHand}
-          className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs flex items-center gap-2 transition-colors border border-slate-700"
+          className="px-4 py-1.5 bg-m3-surfaceContainerHigh hover:bg-m3-surfaceBright text-m3-onSurface font-medium rounded-m3-full text-xs flex items-center gap-2 transition-colors border border-m3-outlineVariant/40 shadow-sm"
         >
-          <RefreshCw className="w-3.5 h-3.5 text-emerald-400" />
-          <span>New Random Hand</span>
+          <RefreshCw className="w-3.5 h-3.5 text-m3-primary" />
+          <span>New Hand</span>
         </button>
       </div>
 
-      {/* Main Trainer Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {/* Main Grid Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         
-        {/* Left Column: Hand Deal & Action Buttons */}
-        <div className="lg:col-span-6 flex flex-col items-center bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+        {/* Left Column: Cards & M3 Buttons */}
+        <div className="lg:col-span-6 flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outlineVariant/40 rounded-m3-xl p-6 shadow-sm relative">
           
-          {/* Poker Table Visualizer */}
           <PokerTable
             heroPosition={currentSpot.heroPosition}
             villainPosition={currentSpot.villainPosition}
@@ -193,69 +187,67 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             facingAction={currentSpot.facingAction}
           />
 
-          {/* Cards Display */}
-          <div className="my-6 flex items-center justify-center gap-4">
+          <div className="my-5 flex items-center justify-center gap-4">
             {dealtCards.map((card, idx) => (
               <PlayingCard key={idx} card={card} size="lg" animated />
             ))}
           </div>
 
-          {/* Hand Category Badge */}
-          <div className="mb-6 flex flex-col items-center gap-1">
-            <span className="text-2xl font-black tracking-tight text-white bg-slate-950 px-4 py-1 rounded-xl border border-slate-800 shadow-inner">
+          <div className="mb-5 flex flex-col items-center gap-1">
+            <span className="text-xl font-bold tracking-tight text-m3-onSurface bg-m3-surfaceContainerHigh px-4 py-1 rounded-m3-md border border-m3-outlineVariant/40">
               {handNotation}
             </span>
-            <span className="text-xs text-slate-400 font-medium">
+            <span className="text-xs text-m3-onSurfaceVariant font-medium">
               Hero: {formatPositionLabel(currentSpot.heroPosition)}
             </span>
           </div>
 
-          {/* Action Buttons */}
+          {/* M3 Action Buttons */}
           <div className="w-full max-w-md space-y-3">
-            <div className="text-xs font-semibold text-slate-400 text-center uppercase tracking-wider mb-2">
-              Select Your Action
+            <div className="text-xs font-medium text-m3-onSurfaceVariant text-center uppercase tracking-wider mb-2">
+              Select Optimal Play
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              {/* FOLD BUTTON */}
+              {/* FOLD BUTTON (M3 Tonal Neutral) */}
               <button
                 onClick={() => handleActionPick('fold')}
                 disabled={userAction !== null}
-                className={`py-3 px-4 rounded-xl font-bold text-sm transition-all flex flex-col items-center justify-center shadow-lg border ${
+                className={`py-3 px-4 rounded-m3-full font-semibold text-xs transition-all flex flex-col items-center justify-center border shadow-sm ${
                   userAction === 'fold'
-                    ? 'bg-slate-700 border-white ring-4 ring-slate-500/40 text-white scale-105'
-                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700 hover:border-slate-500'
-                } ${userAction !== null ? 'opacity-80' : ''}`}
+                    ? 'bg-m3-surfaceBright border-m3-onSurface text-m3-onSurface ring-2 ring-m3-outline'
+                    : 'bg-m3-surfaceContainerHighest hover:bg-m3-surfaceBright text-m3-onSurface border-m3-outlineVariant/40'
+                }`}
               >
                 <span>FOLD</span>
-                <span className="text-[10px] text-slate-400 font-normal mt-0.5">(Key 1)</span>
+                <span className="text-[10px] text-m3-onSurfaceVariant font-normal mt-0.5">(Key 1)</span>
               </button>
 
-              {/* CALL BUTTON (Only enabled if spot allows call) */}
+              {/* CALL BUTTON (M3 Primary Tonal Container) */}
               <button
                 onClick={() => handleActionPick('call')}
                 disabled={userAction !== null || !currentSpot.allowedActions.includes('call')}
-                className={`py-3 px-4 rounded-xl font-bold text-sm transition-all flex flex-col items-center justify-center shadow-lg border ${
+                className={`py-3 px-4 rounded-m3-full font-semibold text-xs transition-all flex flex-col items-center justify-center border shadow-sm ${
                   !currentSpot.allowedActions.includes('call')
-                    ? 'bg-slate-950 text-slate-600 border-slate-800 opacity-40 cursor-not-allowed'
+                    ? 'bg-m3-surfaceContainer text-m3-outline border-m3-outlineVariant/20 opacity-40 cursor-not-allowed'
                     : userAction === 'call'
-                    ? 'bg-emerald-600 border-white ring-4 ring-emerald-500/40 text-white scale-105'
-                    : 'bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 border-emerald-800/60 hover:border-emerald-500'
+                    ? 'bg-m3-primaryContainer border-m3-primary text-m3-onPrimaryContainer ring-2 ring-m3-primary'
+                    : 'bg-m3-primaryContainer/70 hover:bg-m3-primaryContainer text-m3-onPrimaryContainer border-m3-primary/40'
                 }`}
               >
                 <span>CALL</span>
                 <span className="text-[10px] opacity-75 font-normal mt-0.5">(Key 2)</span>
               </button>
 
-              {/* RAISE BUTTON */}
+              {/* RAISE BUTTON (M3 Error / Raise Tonal Container) */}
               <button
                 onClick={() => handleActionPick('raise')}
                 disabled={userAction !== null}
-                className={`py-3 px-4 rounded-xl font-bold text-sm transition-all flex flex-col items-center justify-center shadow-lg border ${
+                className={`py-3 px-4 rounded-m3-full font-semibold text-xs transition-all flex flex-col items-center justify-center border shadow-sm ${
                   userAction === 'raise'
-                    ? 'bg-red-600 border-white ring-4 ring-red-500/40 text-white scale-105'
-                    : 'bg-red-950/60 hover:bg-red-900/80 text-red-300 border-red-800/60 hover:border-red-500'
-                } ${userAction !== null ? 'opacity-80' : ''}`}
+                    ? 'bg-m3-pokerRaiseContainer border-m3-pokerRaise text-m3-pokerRaise ring-2 ring-m3-pokerRaise'
+                    : 'bg-m3-pokerRaiseContainer/70 hover:bg-m3-pokerRaiseContainer text-m3-pokerRaise border-m3-pokerRaise/40'
+                }`}
               >
                 <span>{currentSpot.raiseLabel.split(' ')[0]}</span>
                 <span className="text-[10px] opacity-75 font-normal mt-0.5">(Key 3)</span>
@@ -264,10 +256,8 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
           </div>
         </div>
 
-        {/* Right Column: Interactive 13x13 Grid Matrix Solution & Post-Guess Feedback */}
+        {/* Right Column: Solution Grid & Morphology Feedback */}
         <div className="lg:col-span-6 space-y-4 flex flex-col items-center">
-          
-          {/* Post-Guess Educational Feedback */}
           {evaluation && (
             <MorphologyExplanation
               isCorrect={evaluation.isCorrect}
@@ -283,12 +273,11 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             />
           )}
 
-          {/* 13x13 Solution Grid Matrix */}
-          <div className="w-full bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
+          <div className="w-full bg-m3-surfaceContainerLow border border-m3-outlineVariant/40 rounded-m3-xl p-4 shadow-sm">
             <RangeGrid
               spot={currentSpot}
               highlightHand={handNotation}
-              title={`GTO Solution Grid: ${currentSpot.name}`}
+              title={`GTO Solution: ${currentSpot.name}`}
               showLegend
             />
           </div>

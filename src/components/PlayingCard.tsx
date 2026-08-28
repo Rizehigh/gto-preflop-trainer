@@ -13,21 +13,21 @@ export const PlayingCard: React.FC<PlayingCardProps> = ({ card, size = 'md', ani
   const colorClass = SUIT_COLORS[card.suit];
 
   const sizeClasses = {
-    sm: 'w-12 h-16 text-sm p-1 rounded border',
-    md: 'w-20 h-28 text-xl p-2 rounded-lg border-2 shadow-lg',
-    lg: 'w-28 h-40 text-3xl p-3 rounded-xl border-2 shadow-xl'
+    sm: 'w-12 h-16 text-sm p-1 rounded-m3-sm border',
+    md: 'w-20 h-28 text-xl p-2 rounded-m3-md border shadow-md',
+    lg: 'w-24 h-36 text-2xl p-2.5 rounded-m3-lg border-2 shadow-lg'
   }[size];
 
   const symbolSizeClasses = {
     sm: 'text-lg',
     md: 'text-3xl',
-    lg: 'text-5xl'
+    lg: 'text-4xl'
   }[size];
 
   return (
     <div
-      className={`relative flex flex-col justify-between bg-slate-900 border-slate-700/80 text-slate-100 font-bold select-none transform transition-all duration-300 ${
-        animated ? 'hover:-translate-y-1 hover:shadow-emerald-500/10 hover:border-slate-500' : ''
+      className={`relative flex flex-col justify-between bg-m3-surfaceContainerHighest border-m3-outlineVariant/60 text-m3-onSurface font-bold select-none transition-transform duration-200 ${
+        animated ? 'hover:-translate-y-1 hover:shadow-lg hover:border-m3-outline' : ''
       } ${sizeClasses}`}
     >
       {/* Top Left Corner */}

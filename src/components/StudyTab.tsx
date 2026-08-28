@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { SPOT_DEFINITIONS } from '../data/gtoRanges';
 import { SpotDefinition } from '../types/poker';
 import { RangeGrid } from './RangeGrid';
-import { getAll169Hands, getHandCombosCount, formatPositionLabel } from '../utils/pokerUtils';
-import { Grid, Eye, Layers, Lightbulb, Compass, Filter } from 'lucide-react';
+import { getAll169Hands, getHandCombosCount } from '../utils/pokerUtils';
+import { Grid, Filter } from 'lucide-react';
 
 export const StudyTab: React.FC = () => {
   const [selectedSpot, setSelectedSpot] = useState<SpotDefinition>(SPOT_DEFINITIONS[0]);
   const [filterAction, setFilterAction] = useState<'all' | 'raise' | 'call' | 'mixed'>('all');
 
-  // Compute total combos and percentages for the current spot
   const computeSpotStats = () => {
     let totalCombos = 0;
     let raiseCombos = 0;
@@ -20,7 +19,7 @@ export const StudyTab: React.FC = () => {
     for (const hand of all169) {
       const combos = getHandCombosCount(hand);
       const freq = selectedSpot.ranges[hand] || { fold: 1, call: 0, raise: 0 };
-      totalCombos += combos; // 1326 total combos in poker
+      totalCombos += combos;
       raiseCombos += combos * (freq.raise || 0);
       callCombos += combos * (freq.call || 0);
       foldCombos += combos * (freq.fold || 0);
@@ -37,29 +36,29 @@ export const StudyTab: React.FC = () => {
   const stats = computeSpotStats();
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6">
+    <div className="w-full max-w-6xl mx-auto space-y-5">
       
-      {/* Top Header & Spot Selector */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+      {/* Top Header Card */}
+      <div className="bg-m3-surfaceContainerLow border border-m3-outlineVariant/40 rounded-m3-xl p-6 shadow-sm space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-m3-primary">
               <Grid className="w-4 h-4" />
               <span>Range Explorer & Study Mode</span>
             </div>
-            <h2 className="text-2xl font-bold text-slate-100 mt-1">{selectedSpot.name}</h2>
-            <p className="text-xs text-slate-400 mt-0.5">{selectedSpot.description}</p>
+            <h2 className="text-xl font-bold text-m3-onSurface mt-1">{selectedSpot.name}</h2>
+            <p className="text-xs text-m3-onSurfaceVariant mt-0.5">{selectedSpot.description}</p>
           </div>
 
           <div className="flex items-center gap-3">
-            <label className="text-xs font-semibold text-slate-400">Select Spot:</label>
+            <label className="text-xs font-medium text-m3-onSurfaceVariant">Select Spot:</label>
             <select
               value={selectedSpot.id}
               onChange={(e) => {
                 const s = SPOT_DEFINITIONS.find(spot => spot.id === e.target.value);
                 if (s) setSelectedSpot(s);
               }}
-              className="bg-slate-950 text-slate-100 border border-slate-700 rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-inner"
+              className="bg-m3-surfaceContainerHigh text-m3-onSurface border border-m3-outlineVariant/50 rounded-m3-md px-3.5 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-m3-primary"
             >
               {SPOT_DEFINITIONS.map(spot => (
                 <option key={spot.id} value={spot.id}>
@@ -70,49 +69,49 @@ export const StudyTab: React.FC = () => {
           </div>
         </div>
 
-        {/* Stats & Frequency Summary Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-          <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-center">
-            <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Total Played Range</div>
-            <div className="text-xl font-black text-emerald-400 mt-1">{stats.playPct}%</div>
-            <div className="text-[10px] text-slate-500">{stats.raiseCombos + stats.callCombos} combos</div>
+        {/* Stats Summary Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+          <div className="bg-m3-surfaceContainerHigh p-3 rounded-m3-lg border border-m3-outlineVariant/30 text-center">
+            <div className="text-[10px] uppercase font-semibold tracking-wider text-m3-onSurfaceVariant">Total Played</div>
+            <div className="text-xl font-bold text-m3-primary mt-0.5">{stats.playPct}%</div>
+            <div className="text-[10px] text-m3-onSurfaceVariant">{stats.raiseCombos + stats.callCombos} combos</div>
           </div>
 
-          <div className="bg-slate-950 p-3.5 rounded-xl border border-red-900/40 text-center">
-            <div className="text-[10px] uppercase font-bold tracking-wider text-red-400">Raise / 3-Bet</div>
-            <div className="text-xl font-black text-red-400 mt-1">{stats.raisePct}%</div>
-            <div className="text-[10px] text-slate-500">{stats.raiseCombos} combos</div>
+          <div className="bg-m3-surfaceContainerHigh p-3 rounded-m3-lg border border-m3-outlineVariant/30 text-center">
+            <div className="text-[10px] uppercase font-semibold tracking-wider text-red-400">Raise / 3-Bet</div>
+            <div className="text-xl font-bold text-red-400 mt-0.5">{stats.raisePct}%</div>
+            <div className="text-[10px] text-m3-onSurfaceVariant">{stats.raiseCombos} combos</div>
           </div>
 
-          <div className="bg-slate-950 p-3.5 rounded-xl border border-emerald-900/40 text-center">
-            <div className="text-[10px] uppercase font-bold tracking-wider text-emerald-400">Call / Defend</div>
-            <div className="text-xl font-black text-emerald-300 mt-1">{stats.callPct}%</div>
-            <div className="text-[10px] text-slate-500">{stats.callCombos} combos</div>
+          <div className="bg-m3-surfaceContainerHigh p-3 rounded-m3-lg border border-m3-outlineVariant/30 text-center">
+            <div className="text-[10px] uppercase font-semibold tracking-wider text-emerald-400">Call / Defend</div>
+            <div className="text-xl font-bold text-emerald-400 mt-0.5">{stats.callPct}%</div>
+            <div className="text-[10px] text-m3-onSurfaceVariant">{stats.callCombos} combos</div>
           </div>
 
-          <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-center">
-            <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Fold Frequency</div>
-            <div className="text-xl font-black text-slate-400 mt-1">{stats.foldPct}%</div>
-            <div className="text-[10px] text-slate-500">{1326 - stats.raiseCombos - stats.callCombos} combos</div>
+          <div className="bg-m3-surfaceContainerHigh p-3 rounded-m3-lg border border-m3-outlineVariant/30 text-center">
+            <div className="text-[10px] uppercase font-semibold tracking-wider text-m3-onSurfaceVariant">Fold</div>
+            <div className="text-xl font-bold text-m3-onSurfaceVariant mt-0.5">{stats.foldPct}%</div>
+            <div className="text-[10px] text-m3-onSurfaceVariant">{1326 - stats.raiseCombos - stats.callCombos} combos</div>
           </div>
         </div>
       </div>
 
-      {/* Main Grid & Filter Section */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+      {/* Main Grid Card */}
+      <div className="bg-m3-surfaceContainerLow border border-m3-outlineVariant/40 rounded-m3-xl p-6 shadow-sm space-y-5">
         
         {/* Filter Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-m3-outlineVariant/30 pb-4">
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-emerald-400" />
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Highlight Action Filter:</span>
+            <Filter className="w-4 h-4 text-m3-primary" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-m3-onSurface">Action Highlight Filter:</span>
           </div>
 
-          <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800">
+          <div className="flex items-center p-1 bg-m3-surfaceContainerHighest rounded-m3-full border border-m3-outlineVariant/30">
             <button
               onClick={() => setFilterAction('all')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                filterAction === 'all' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white'
+              className={`px-3 py-1 rounded-m3-full text-xs font-medium transition-all ${
+                filterAction === 'all' ? 'bg-m3-secondaryContainer text-m3-onSecondaryContainer font-semibold' : 'text-m3-onSurfaceVariant hover:text-m3-onSurface'
               }`}
             >
               All Hands
@@ -120,17 +119,17 @@ export const StudyTab: React.FC = () => {
 
             <button
               onClick={() => setFilterAction('raise')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                filterAction === 'raise' ? 'bg-red-500 text-white' : 'text-slate-400 hover:text-white'
+              className={`px-3 py-1 rounded-m3-full text-xs font-medium transition-all ${
+                filterAction === 'raise' ? 'bg-red-600 text-white font-semibold' : 'text-m3-onSurfaceVariant hover:text-m3-onSurface'
               }`}
             >
-              Raises / 3-Bets
+              Raises
             </button>
 
             <button
               onClick={() => setFilterAction('call')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                filterAction === 'call' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
+              className={`px-3 py-1 rounded-m3-full text-xs font-medium transition-all ${
+                filterAction === 'call' ? 'bg-emerald-600 text-white font-semibold' : 'text-m3-onSurfaceVariant hover:text-m3-onSurface'
               }`}
             >
               Calls
@@ -138,25 +137,24 @@ export const StudyTab: React.FC = () => {
 
             <button
               onClick={() => setFilterAction('mixed')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                filterAction === 'mixed' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'
+              className={`px-3 py-1 rounded-m3-full text-xs font-medium transition-all ${
+                filterAction === 'mixed' ? 'bg-amber-500 text-m3-surface font-semibold' : 'text-m3-onSurfaceVariant hover:text-m3-onSurface'
               }`}
             >
-              Mixed Strategy
+              Mixed
             </button>
           </div>
         </div>
 
-        {/* The Interactive 13x13 Grid */}
         <RangeGrid
           spot={selectedSpot}
-          title={`${selectedSpot.name} Range Grid Solution`}
+          title={`${selectedSpot.name} Full Range Matrix`}
           filterAction={filterAction}
           showLegend
         />
 
-        <p className="text-xs text-slate-400 text-center italic">
-          💡 Tip: Click any hand cell above to view its exact combo breakdown, action percentages, and hand morphology principles.
+        <p className="text-xs text-m3-onSurfaceVariant text-center italic">
+          💡 Click any matrix hand cell to inspect combo counts, frequency distribution, and morphology notes.
         </p>
       </div>
 

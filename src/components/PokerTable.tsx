@@ -16,7 +16,6 @@ export const PokerTable: React.FC<PokerTableProps> = ({
 }) => {
   const positions: Position[] = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'];
 
-  // Table seat coordinates around an oval
   const seatPositions: Record<Position, { top: string; left: string }> = {
     UTG: { top: '80%', left: '20%' },
     HJ: { top: '20%', left: '20%' },
@@ -27,18 +26,14 @@ export const PokerTable: React.FC<PokerTableProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-xl h-64 bg-emerald-950/60 rounded-full border-8 border-emerald-900 shadow-2xl flex items-center justify-center p-4 overflow-hidden my-4">
-      {/* Felt background pattern */}
-      <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/40 via-emerald-950/80 to-emerald-950 pointer-events-none" />
-      <div className="absolute inset-3 rounded-full border border-emerald-700/30 pointer-events-none" />
-
+    <div className="relative w-full max-w-lg h-56 bg-m3-surfaceContainerLow rounded-m3-full border-4 border-m3-outlineVariant/50 shadow-md flex items-center justify-center p-4 overflow-hidden my-2">
       {/* Table Center Info */}
-      <div className="relative z-10 text-center px-4 py-2 bg-slate-950/80 rounded-xl border border-emerald-500/20 backdrop-blur-sm max-w-xs shadow-lg">
-        <div className="text-xs uppercase tracking-wider text-emerald-400 font-semibold">{spotName}</div>
-        <div className="text-sm font-medium text-slate-200 mt-0.5">{facingAction}</div>
+      <div className="relative z-10 text-center px-4 py-2 bg-m3-surfaceContainerHigh/90 rounded-m3-lg border border-m3-outlineVariant/40 backdrop-blur-sm max-w-xs shadow-sm">
+        <div className="text-[11px] uppercase tracking-wider text-m3-primary font-medium">{spotName}</div>
+        <div className="text-xs font-semibold text-m3-onSurface mt-0.5">{facingAction}</div>
       </div>
 
-      {/* Seats around the table */}
+      {/* Seats around table */}
       {positions.map((pos) => {
         const isHero = pos === heroPosition;
         const isVillain = pos === villainPosition;
@@ -48,30 +43,26 @@ export const PokerTable: React.FC<PokerTableProps> = ({
           <div
             key={pos}
             style={{ top: coords.top, left: coords.left, transform: 'translate(-50%, -50%)' }}
-            className={`absolute flex flex-col items-center z-20 transition-all duration-300 ${
-              isHero
-                ? 'scale-110'
-                : isVillain
-                ? 'scale-105'
-                : 'opacity-60 scale-95'
+            className={`absolute flex flex-col items-center z-20 transition-all duration-200 ${
+              isHero ? 'scale-105' : isVillain ? 'scale-100' : 'opacity-50 scale-90'
             }`}
           >
             <div
-              className={`px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1.5 border ${
+              className={`px-3 py-1 rounded-m3-full text-xs font-semibold shadow flex items-center gap-1.5 border ${
                 isHero
-                  ? 'bg-emerald-500 text-slate-950 border-emerald-300 ring-4 ring-emerald-500/30 animate-pulse'
+                  ? 'bg-m3-primaryContainer text-m3-onPrimaryContainer border-m3-primary ring-2 ring-m3-primary/30'
                   : isVillain
-                  ? 'bg-amber-500 text-slate-950 border-amber-300 ring-2 ring-amber-500/30'
-                  : 'bg-slate-800 text-slate-300 border-slate-700'
+                  ? 'bg-m3-tertiaryContainer text-m3-onTertiaryContainer border-m3-tertiary'
+                  : 'bg-m3-surfaceContainerHighest text-m3-onSurfaceVariant border-m3-outlineVariant/40'
               }`}
             >
               <span>{pos}</span>
-              {isHero && <span className="text-[10px] bg-slate-950 text-emerald-400 px-1 rounded uppercase">Hero</span>}
-              {isVillain && <span className="text-[10px] bg-slate-950 text-amber-400 px-1 rounded uppercase">Opener</span>}
+              {isHero && <span className="text-[9px] bg-m3-onPrimaryContainer text-m3-primaryContainer px-1 rounded-m3-xs uppercase font-bold">Hero</span>}
+              {isVillain && <span className="text-[9px] bg-m3-onTertiaryContainer text-m3-tertiaryContainer px-1 rounded-m3-xs uppercase font-bold">Opener</span>}
             </div>
 
             {pos === 'BTN' && (
-              <div className="mt-1 w-5 h-5 bg-white text-slate-950 text-[10px] font-black rounded-full flex items-center justify-center shadow border border-slate-300">
+              <div className="mt-1 w-4 h-4 bg-m3-onSurface text-m3-surface text-[9px] font-black rounded-m3-full flex items-center justify-center shadow">
                 D
               </div>
             )}

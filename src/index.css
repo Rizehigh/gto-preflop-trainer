@@ -8,17 +8,35 @@
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Material Design 3 State Layer & Elevation Utilities */
+.m3-card-elevated {
+  @apply bg-m3-surfaceContainerLow border border-m3-outlineVariant/40 rounded-m3-xl shadow-md transition-shadow hover:shadow-lg;
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.m3-card-filled {
+  @apply bg-m3-surfaceContainerHigh rounded-m3-xl border border-transparent;
+}
+
+.m3-card-outlined {
+  @apply bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant;
+}
+
+.m3-button-filled {
+  @apply bg-m3-primary text-m3-onPrimary font-medium rounded-m3-full px-6 py-2.5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none;
+}
+
+.m3-button-tonal {
+  @apply bg-m3-secondaryContainer text-m3-onSecondaryContainer font-medium rounded-m3-full px-6 py-2.5 transition-all hover:bg-m3-secondaryContainer/80 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none;
+}
+
+.m3-button-outlined {
+  @apply border border-m3-outline text-m3-primary font-medium rounded-m3-full px-6 py-2.5 hover:bg-m3-primary/10 transition-all active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none;
+}
+
+.m3-chip {
+  @apply px-3 py-1 rounded-m3-sm text-xs font-medium border border-m3-outlineVariant bg-m3-surfaceContainerHigh text-m3-onSurfaceVariant flex items-center gap-1.5 transition-colors;
+}
+
+.m3-chip-selected {
+  @apply bg-m3-secondaryContainer text-m3-onSecondaryContainer border-m3-secondaryContainer font-semibold;
 }

@@ -62,7 +62,7 @@ export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
 
         <button
           onClick={onNext}
-          className="px-4 py-2 bg-m3-primary hover:bg-blue-400 text-m3-onPrimary font-extrabold rounded-m3-xs shadow transition-all shrink-0 text-xs flex items-center gap-1.5 active:scale-95"
+          className="px-4 py-2 bg-m3-primary hover:bg-amber-300 text-m3-onPrimary font-extrabold rounded-m3-xs shadow transition-all shrink-0 text-xs flex items-center gap-1.5 active:scale-95"
         >
           <span>Next Hand</span>
           <span className="text-[10px] opacity-80 hidden sm:inline">(Space)</span>
@@ -99,7 +99,7 @@ export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
           </div>
 
           <div className="bg-m3-surfaceContainerHigh p-3 rounded-m3-sm border border-m3-outlineVariant flex items-start gap-2.5">
-            <Shield className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+            <Shield className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <div>
               <div className="font-bold text-m3-onSurface">Blocker Value</div>
               <div className="text-m3-onSurfaceVariant mt-0.5 font-medium">{insight.blockerValue}</div>

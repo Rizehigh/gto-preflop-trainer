@@ -8,9 +8,9 @@
   }
 }
 
-/* Crisp Dark Material 3 Design System - Sharp & High Contrast */
+/* Crisp Dark Material 3 Design System - Gold & Charcoal (Zero Blue) */
 body {
-  background-color: #0d0e12;
+  background-color: #0d0e11;
   color: #f3f4f6;
   font-family: 'Roboto Flex', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -29,7 +29,7 @@ body {
 }
 
 .m3-button-filled {
-  @apply bg-m3-primary text-m3-onPrimary font-semibold rounded-m3-sm px-5 py-2 shadow transition-all hover:bg-blue-400 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none;
+  @apply bg-m3-primary text-m3-onPrimary font-bold rounded-m3-sm px-5 py-2 shadow transition-all hover:bg-amber-300 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none;
 }
 
 .m3-button-tonal {

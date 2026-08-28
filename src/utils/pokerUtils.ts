@@ -20,14 +20,14 @@ export const SUIT_NAMES: Record<Suit, string> = {
 export const SUIT_COLORS: Record<Suit, string> = {
   s: 'text-slate-100', // Spades
   h: 'text-red-500',   // Hearts
-  d: 'text-blue-400',  // Diamonds
-  c: 'text-emerald-500' // Clubs
+  d: 'text-amber-400', // Diamonds (Warm Gold)
+  c: 'text-emerald-500' // Clubs (Emerald Green)
 };
 
 export const SUIT_BG: Record<Suit, string> = {
   s: 'bg-slate-800 text-slate-100 border border-slate-700',
   h: 'bg-red-950/80 text-red-400 border border-red-800/50',
-  d: 'bg-blue-950/80 text-blue-400 border border-blue-800/50',
+  d: 'bg-amber-950/80 text-amber-400 border border-amber-800/50',
   c: 'bg-emerald-950/80 text-emerald-400 border border-emerald-800/50'
 };
 

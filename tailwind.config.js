@@ -8,29 +8,29 @@ export default {
     extend: {
       colors: {
         m3: {
-          surface: '#0d0e12',
-          surfaceContainerLow: '#14161d',
-          surfaceContainer: '#1a1d26',
-          surfaceContainerHigh: '#212530',
-          surfaceContainerHighest: '#2a2f3d',
-          surfaceBright: '#343a4b',
+          surface: '#0d0e11',
+          surfaceContainerLow: '#14161a',
+          surfaceContainer: '#1a1d22',
+          surfaceContainerHigh: '#22262d',
+          surfaceContainerHighest: '#2c313a',
+          surfaceBright: '#363d48',
           
-          primary: '#60a5fa',           // Crisp Soft Blue
-          onPrimary: '#0f172a',
-          primaryContainer: '#1e3a8a',   // Deep Blue Container
-          onPrimaryContainer: '#dbeafe',
+          primary: '#fbbf24',           // Warm Vivid Gold / Amber (Zero Blue!)
+          onPrimary: '#1c1917',
+          primaryContainer: '#451a03',   // Deep Gold/Amber Container
+          onPrimaryContainer: '#fef3c7',
           
-          secondary: '#38bdf8',
-          onSecondary: '#0c4a6e',
-          secondaryContainer: '#1e293b', // Crisp Dark Slate
-          onSecondaryContainer: '#f1f5f9',
+          secondary: '#34d399',          // Crisp Emerald / Mint Accent
+          onSecondary: '#064e3b',
+          secondaryContainer: '#064e3b', // Deep Emerald Container
+          onSecondaryContainer: '#a7f3d0',
 
-          tertiary: '#fbbf24',          // Gold Accent
-          onTertiary: '#451a03',
-          tertiaryContainer: '#78350f',
-          onTertiaryContainer: '#fef3c7',
+          tertiary: '#f87171',           // Coral Red Accent
+          onTertiary: '#450a0a',
+          tertiaryContainer: '#7f1d1d',
+          onTertiaryContainer: '#fee2e2',
 
-          error: '#f87171',
+          error: '#ef4444',
           onError: '#450a0a',
           errorContainer: '#7f1d1d',
           onErrorContainer: '#fee2e2',

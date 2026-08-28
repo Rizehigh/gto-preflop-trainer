@@ -78,7 +78,7 @@ export const GuideTab: React.FC = () => {
               <span className="font-bold text-m3-primary">Button (BTN)</span>
               <span className="text-m3-onSurfaceVariant block text-[11px]">Best seat at the table. Opens wide (~44% range) and acts last on every postflop street.</span>
             </div>
-            <span className="px-3 py-1 bg-m3-primaryContainer text-m3-onPrimaryContainer font-bold rounded-m3-xs">Widest</span>
+            <span className="px-3 py-1 bg-amber-950 text-amber-300 font-bold rounded-m3-xs border border-amber-500">Widest</span>
           </div>
 
           <div className="bg-m3-surfaceContainerHigh p-3.5 rounded-m3-xs border border-m3-outlineVariant flex justify-between items-center text-xs">
@@ -86,7 +86,7 @@ export const GuideTab: React.FC = () => {
               <span className="font-bold text-m3-primary">Big Blind (BB)</span>
               <span className="text-m3-onSurfaceVariant block text-[11px]">Already posted 1 BB. Defends wide against opens due to discounted call odds.</span>
             </div>
-            <span className="px-3 py-1 bg-amber-950 text-amber-300 font-bold rounded-m3-xs border border-amber-500">Defensive</span>
+            <span className="px-3 py-1 bg-emerald-950 text-emerald-300 font-bold rounded-m3-xs border border-emerald-500">Defensive</span>
           </div>
         </div>
       </div>
@@ -114,7 +114,7 @@ export const GuideTab: React.FC = () => {
           </div>
 
           <div className="bg-m3-surfaceContainerHigh p-4 rounded-m3-xs border border-m3-outlineVariant space-y-1.5">
-            <h4 className="font-bold text-blue-300 text-xs">Ace Blockers & 3-Bet Bluffs</h4>
+            <h4 className="font-bold text-emerald-300 text-xs">Ace Blockers & 3-Bet Bluffs</h4>
             <p className="text-m3-onSurfaceVariant leading-relaxed">
               Holding an Ace (like A5s or A4s) reduces the chances your opponent holds AA or AK by 50%! Perfect for 3-bet bluffs.
             </p>

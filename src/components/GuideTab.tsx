@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Layers, Zap, Compass } from 'lucide-react';
+import { BookOpen, Layers, Zap, Compass, Users } from 'lucide-react';
 import { GtoMathSection } from './GtoMathSection';
 import { RangeQuizSection } from './RangeQuizSection';
 
@@ -132,6 +132,63 @@ export const GuideTab: React.FC = () => {
             <h4 className="font-bold text-purple-300 text-xs">Connectivity & Implied Odds</h4>
             <p className="text-m3-onSurfaceVariant leading-relaxed">
               Sequential hands (like 87s or JTs) make sneaky straights that stack opponents holding overpairs (AA/KK).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Section 4: Amateur Exploitative Strategy */}
+      <div className="bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 shadow-sm space-y-4">
+        <h3 className="text-base font-bold text-m3-onSurface flex items-center gap-2">
+          <Users className="w-4 h-4 text-amber-400" />
+          <span>4. Amateur Exploitative Play & Opponent Archetypes</span>
+        </h3>
+        <p className="text-xs text-m3-onSurfaceVariant leading-relaxed font-medium">
+          GTO equilibrium assumes opponents play perfectly. When facing amateur opponents who deviate heavily from GTO, maximum EV comes from <strong>exploitative play</strong>—intentionally adjusting your strategy to target their specific leaks.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div className="bg-red-950/40 p-4 rounded-m3-xs border border-red-500/50 space-y-1.5">
+            <div className="flex items-center gap-2 text-red-300 font-bold">
+              <span className="text-base">💣</span>
+              <span>Maniac (Super Aggressive)</span>
+            </div>
+            <p className="text-zinc-300 font-medium leading-relaxed">
+              <strong>Tendency:</strong> Opens 50-70% of hands, 3-bets relentlessly with weak trash, never folds to aggression.<br/>
+              <strong>Exploit:</strong> Tighten value range, eliminate light bluffs, trap with top pairs & strong broadways.
+            </p>
+          </div>
+
+          <div className="bg-blue-950/40 p-4 rounded-m3-xs border border-blue-500/50 space-y-1.5">
+            <div className="flex items-center gap-2 text-blue-300 font-bold">
+              <span className="text-base">🦥</span>
+              <span>Calling Station (Passive)</span>
+            </div>
+            <p className="text-zinc-300 font-medium leading-relaxed">
+              <strong>Tendency:</strong> Over-calls opens & 3-bets with weak trash, almost never raises without absolute nuts.<br/>
+              <strong>Exploit:</strong> Value bet larger & wider. Never bluff (bluffs torch money against stations).
+            </p>
+          </div>
+
+          <div className="bg-amber-950/40 p-4 rounded-m3-xs border border-amber-500/50 space-y-1.5">
+            <div className="flex items-center gap-2 text-amber-300 font-bold">
+              <span className="text-base">🐢</span>
+              <span>Ultra Tight Nit</span>
+            </div>
+            <p className="text-zinc-300 font-medium leading-relaxed">
+              <strong>Tendency:</strong> Plays top 5-10% of hands. Folds 85%+ to open raises and 3-bets.<br/>
+              <strong>Exploit:</strong> Steal their blinds continuously and 3-bet bluff heavily. Fold marginal hands when they raise.
+            </p>
+          </div>
+
+          <div className="bg-purple-950/40 p-4 rounded-m3-xs border border-purple-500/50 space-y-1.5">
+            <div className="flex items-center gap-2 text-purple-300 font-bold">
+              <span className="text-base">🎲</span>
+              <span>Wild / Unpredictable</span>
+            </div>
+            <p className="text-zinc-300 font-medium leading-relaxed">
+              <strong>Tendency:</strong> Erratic play, overvalues suited cards and gutshots, random huge raises.<br/>
+              <strong>Exploit:</strong> Play a clean linear strategy. Focus on high-card equity and postflop positioning.
             </p>
           </div>
         </div>

@@ -365,8 +365,8 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             </button>
           </div>
 
-          {/* Action Buttons */}
-          <div className="w-full max-w-md space-y-3">
+          {/* Action Buttons & GTO Math Toolbar */}
+          <div className="w-full max-w-xl md:max-w-2xl lg:max-w-3xl space-y-3">
             <div className="text-xs font-bold text-m3-onSurfaceVariant text-center uppercase tracking-wider mb-2">
               {isAmateurMode ? 'Select Optimal Exploitative Play' : 'Select Optimal GTO Play'}
             </div>

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { HandCategoryType, Position, UserStats } from '../types/poker';
+import { AMATEUR_PROFILES } from '../data/amateurProfiles';
 import { formatHandCategoryLabel, formatPositionLabel } from '../utils/pokerUtils';
 import { BarChart3, AlertTriangle, ShieldCheck, RefreshCw, Flame, Target, ChevronRight, Zap, TrendingUp, Activity, PieChart, Crosshair } from 'lucide-react';
 
@@ -527,10 +528,11 @@ export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({
               <thead>
                 <tr className="border-b border-m3-outlineVariant text-m3-onSurfaceVariant font-bold uppercase tracking-wider">
                   <th className="py-2 px-3">Spot</th>
+                  <th className="py-2 px-3">Mode / Opponent</th>
                   <th className="py-2 px-3">Position</th>
                   <th className="py-2 px-3">Hand</th>
                   <th className="py-2 px-3">Your Pick</th>
-                  <th className="py-2 px-3">GTO Optimal</th>
+                  <th className="py-2 px-3">Optimal</th>
                   <th className="py-2 px-3">Result</th>
                 </tr>
               </thead>
@@ -538,6 +540,17 @@ export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({
                 {stats.attemptsHistory.slice(0, 25).map((attempt) => (
                   <tr key={attempt.id} className="hover:bg-m3-surfaceContainerHigh">
                     <td className="py-2.5 px-3 text-m3-onSurface">{attempt.spotName}</td>
+                    <td className="py-2.5 px-3 text-xs">
+                      {attempt.isAmateurMode && attempt.amateurArchetype && AMATEUR_PROFILES[attempt.amateurArchetype as keyof typeof AMATEUR_PROFILES] ? (
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${AMATEUR_PROFILES[attempt.amateurArchetype as keyof typeof AMATEUR_PROFILES].badgeColor}`}>
+                          {AMATEUR_PROFILES[attempt.amateurArchetype as keyof typeof AMATEUR_PROFILES].avatar} {AMATEUR_PROFILES[attempt.amateurArchetype as keyof typeof AMATEUR_PROFILES].shortName}
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-zinc-800 text-zinc-300 border border-zinc-700">
+                          GTO
+                        </span>
+                      )}
+                    </td>
                     <td className="py-2.5 px-3 text-m3-primary font-bold">{attempt.heroPosition}</td>
                     <td className="py-2.5 px-3 font-bold text-amber-300">{attempt.handNotation}</td>
                     <td className="py-2.5 px-3 uppercase text-m3-onSurface">{attempt.userAction}</td>

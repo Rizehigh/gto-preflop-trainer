@@ -7,7 +7,7 @@ import { PokerTable } from './PokerTable';
 import { PlayingCard } from './PlayingCard';
 import { MorphologyExplanation } from './MorphologyExplanation';
 import { RangeGrid } from './RangeGrid';
-import { Filter, RefreshCw, ShieldAlert } from 'lucide-react';
+import { Filter, RefreshCw, ShieldAlert, Lock, Eye, HelpCircle, GraduationCap } from 'lucide-react';
 
 interface TrainerTabProps {
   onRecordAttempt: (attempt: HandAttempt) => void;
@@ -257,30 +257,63 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
         </div>
 
         {/* Right Column: Solution Grid & Morphology Feedback */}
-        <div className="lg:col-span-6 space-y-4 flex flex-col items-center">
-          {evaluation && (
-            <MorphologyExplanation
-              isCorrect={evaluation.isCorrect}
-              userAction={userAction!}
-              optimalAction={evaluation.optimalAction}
-              message={evaluation.message}
-              handNotation={handNotation}
-              cards={dealtCards}
-              handType={classifyHandType(handNotation)}
-              frequencies={freq}
-              spotName={currentSpot.name}
-              onNext={generateNewHand}
-            />
-          )}
+        <div className="lg:col-span-6 space-y-4 flex flex-col items-center w-full">
+          {userAction === null ? (
+            /* Locked / Pre-Decision Learning Placeholder */
+            <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 text-center space-y-4 shadow">
+              <div className="w-12 h-12 bg-m3-surfaceContainerHigh border border-m3-outlineVariant rounded-m3-xs flex items-center justify-center mx-auto text-m3-primary shadow-sm">
+                <Lock className="w-6 h-6" />
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-bold text-m3-onSurface">GTO Solution Matrix Locked</h3>
+                <p className="text-xs text-m3-onSurfaceVariant font-medium mt-1 max-w-sm mx-auto leading-relaxed">
+                  Make your move (Fold, Call, or Raise) to test your preflop intuition and unlock the complete GTO solution matrix & morphology explanation.
+                </p>
+              </div>
 
-          <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow">
-            <RangeGrid
-              spot={currentSpot}
-              highlightHand={handNotation}
-              title={`GTO Solution: ${currentSpot.name}`}
-              showLegend
-            />
-          </div>
+              <div className="bg-m3-surfaceContainerHigh p-4 rounded-m3-xs border border-m3-outlineVariant text-left space-y-2.5">
+                <div className="text-xs font-bold text-m3-primary flex items-center gap-1.5 uppercase tracking-wider">
+                  <GraduationCap className="w-4 h-4" />
+                  <span>How to Learn & Improve</span>
+                </div>
+
+                <ul className="text-xs text-m3-onSurfaceVariant space-y-1.5 font-medium list-disc list-inside">
+                  <li><strong className="text-m3-onSurface">Test Your Decision:</strong> Pick Fold, Call, or Raise for Hero's position.</li>
+                  <li><strong className="text-m3-onSurface">Understand Why:</strong> Read the post-decision morphology insights (Blockers, Suitedness, Equity Realization).</li>
+                  <li><strong className="text-m3-onSurface">Inspect the Matrix:</strong> Click any hand in the revealed 13x13 grid to see combo counts and exact GTO frequencies.</li>
+                  <li><strong className="text-m3-onSurface">Fix Your Leaks:</strong> Check the Analytics tab to practice your weakest seat positions.</li>
+                </ul>
+              </div>
+            </div>
+          ) : (
+            /* Post-Decision Solution & Feedback */
+            <>
+              {evaluation && (
+                <MorphologyExplanation
+                  isCorrect={evaluation.isCorrect}
+                  userAction={userAction}
+                  optimalAction={evaluation.optimalAction}
+                  message={evaluation.message}
+                  handNotation={handNotation}
+                  cards={dealtCards}
+                  handType={classifyHandType(handNotation)}
+                  frequencies={freq}
+                  spotName={currentSpot.name}
+                  onNext={generateNewHand}
+                />
+              )}
+
+              <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow overflow-hidden">
+                <RangeGrid
+                  spot={currentSpot}
+                  highlightHand={handNotation}
+                  title={`GTO Solution: ${currentSpot.name}`}
+                  showLegend
+                />
+              </div>
+            </>
+          )}
         </div>
 
       </div>

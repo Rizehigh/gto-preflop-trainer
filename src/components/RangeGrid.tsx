@@ -31,7 +31,7 @@ export const RangeGrid: React.FC<RangeGridProps> = ({
 
     if (r >= 0.95) return { backgroundColor: '#dc2626' }; // Pure Raise (Red)
     if (c >= 0.95) return { backgroundColor: '#059669' }; // Pure Call (Emerald)
-    if (f >= 0.95) return { backgroundColor: '#1f242e' }; // Pure Fold (Dark Charcoal Container)
+    if (f >= 0.95) return { backgroundColor: '#1f242e' }; // Pure Fold (Dark Charcoal)
 
     const rPct = Math.round(r * 100);
     const cPct = Math.round(c * 100);
@@ -69,7 +69,7 @@ export const RangeGrid: React.FC<RangeGridProps> = ({
   };
 
   return (
-    <div className="w-full flex flex-col items-center select-none">
+    <div className="w-full flex flex-col items-center select-none overflow-hidden">
       {title && (
         <h4 className="text-xs font-bold text-m3-onSurfaceVariant mb-2 tracking-wide text-center uppercase flex items-center gap-2">
           <span>{title}</span>
@@ -78,8 +78,8 @@ export const RangeGrid: React.FC<RangeGridProps> = ({
       )}
 
       {/* 13x13 Grid Container */}
-      <div className="w-full overflow-x-auto pb-2 flex justify-center">
-        <div className={`grid grid-cols-13 gap-0.5 p-1.5 bg-m3-surfaceContainerLow rounded-m3-sm border border-m3-outlineVariant shadow max-w-full min-w-[320px] ${
+      <div className="w-full flex justify-center p-1">
+        <div className={`grid grid-cols-13 gap-0.5 p-1.5 bg-m3-surfaceContainerLow rounded-m3-sm border border-m3-outlineVariant shadow max-w-full min-w-[300px] ${
           compact ? 'max-w-md' : 'max-w-xl'
         }`}>
           {RANKS.map((rowRank, rIdx) =>
@@ -103,7 +103,7 @@ export const RangeGrid: React.FC<RangeGridProps> = ({
                     !matchesFilter ? 'opacity-20 grayscale' : 'hover:scale-105 hover:z-20 hover:ring-2 hover:ring-m3-primary shadow-sm'
                   } ${
                     isHighlighted
-                      ? 'ring-4 ring-amber-400 z-30 animate-bounce scale-110 shadow-md font-extrabold'
+                      ? 'ring-2 ring-amber-400 z-30 scale-105 shadow-md font-extrabold'
                       : ''
                   }`}
                   title={`${notation} (${spot.name}): Raise ${Math.round((freq.raise||0)*100)}%, Call ${Math.round((freq.call||0)*100)}%, Fold ${Math.round((freq.fold||0)*100)}%`}
@@ -113,9 +113,9 @@ export const RangeGrid: React.FC<RangeGridProps> = ({
                   </span>
 
                   {isHighlighted && (
-                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full bg-amber-400 opacity-75"></span>
-                      <span className="relative inline-flex h-2.5 w-2.5 bg-amber-500 border border-black"></span>
+                    <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full bg-amber-400 opacity-75 rounded-full"></span>
+                      <span className="relative inline-flex h-2 w-2 bg-amber-500 rounded-full border border-black"></span>
                     </span>
                   )}
                 </button>

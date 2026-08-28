@@ -1,5 +1,6 @@
 import React from 'react';
 import { BookOpen, Layers, Zap, Compass } from 'lucide-react';
+import { GtoMathSection } from './GtoMathSection';
 
 export const GuideTab: React.FC = () => {
   return (
@@ -16,6 +17,9 @@ export const GuideTab: React.FC = () => {
           Learn foundational principles of preflop range construction, positioning, and hand characteristics.
         </p>
       </div>
+
+      {/* GTO Mathematics for 6 to 10 Max Tables */}
+      <GtoMathSection />
 
       {/* Section 1: Matrix Reading */}
       <div className="bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 shadow-sm space-y-4">

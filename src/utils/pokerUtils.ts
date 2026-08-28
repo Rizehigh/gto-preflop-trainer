@@ -200,13 +200,19 @@ export function getMorphologyStructureMeta(structure: RangeMorphologyStructure):
 export function formatPositionLabel(pos: Position): string {
   const map: Record<Position, string> = {
     UTG: 'Under the Gun (UTG)',
+    'UTG+1': 'Under the Gun +1 (UTG+1)',
+    'UTG+2': 'Under the Gun +2 (UTG+2)',
+    MP: 'Middle Position (MP)',
+    MP1: 'Middle Position 1 (MP1)',
+    MP2: 'Middle Position 2 (MP2)',
+    MP3: 'Middle Position 3 (MP3)',
     HJ: 'Hijack (HJ)',
     CO: 'Cutoff (CO)',
     BTN: 'Button (BTN)',
     SB: 'Small Blind (SB)',
     BB: 'Big Blind (BB)'
   };
-  return map[pos];
+  return map[pos] || pos;
 }
 
 export function formatHandCategoryLabel(cat: HandCategoryType): string {

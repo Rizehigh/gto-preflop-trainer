@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ActionType, Card, HandAttempt, Position, SpotDefinition } from '../types/poker';
+import { ActionType, Card, HandAttempt, Position, SpotDefinition, TableSize } from '../types/poker';
 import { SPOT_DEFINITIONS } from '../data/gtoRanges';
 import { classifyHandType, dealCardsForNotation, evaluateUserAction, formatPositionLabel, getAll169Hands, getMorphologyStructureMeta } from '../utils/pokerUtils';
 import { sounds } from '../utils/soundEffects';
@@ -23,6 +23,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const [dealtCards, setDealtCards] = useState<Card[]>([]);
   const [userAction, setUserAction] = useState<ActionType | null>(null);
   const [showHint, setShowHint] = useState<boolean>(false);
+  const [tableSize, setTableSize] = useState<TableSize>(6);
 
   const [evaluation, setEvaluation] = useState<{
     isCorrect: boolean;
@@ -208,6 +209,8 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             villainPosition={currentSpot.villainPosition}
             spotName={currentSpot.name}
             facingAction={currentSpot.facingAction}
+            tableSize={tableSize}
+            onTableSizeChange={setTableSize}
           />
 
           <div className="my-5 flex items-center justify-center gap-4">

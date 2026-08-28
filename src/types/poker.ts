@@ -6,7 +6,22 @@ export interface Card {
   suit: Suit;
 }
 
-export type Position = 'UTG' | 'HJ' | 'CO' | 'BTN' | 'SB' | 'BB';
+export type TableSize = 6 | 7 | 8 | 9 | 10;
+
+export type Position = 
+  | 'UTG'
+  | 'UTG+1'
+  | 'UTG+2'
+  | 'MP'
+  | 'MP1'
+  | 'MP2'
+  | 'MP3'
+  | 'HJ'
+  | 'CO'
+  | 'BTN'
+  | 'SB'
+  | 'BB';
+
 export type SpotCategory = 'rfi' | 'facing_open' | 'facing_3bet';
 export type ActionType = 'fold' | 'call' | 'raise';
 
@@ -33,6 +48,7 @@ export interface SpotDefinition {
   name: string;
   description: string;
   category: SpotCategory;
+  tableSize?: TableSize;
   heroPosition: Position;
   villainPosition?: Position;
   facingAction: string;
@@ -76,8 +92,17 @@ export interface UserStats {
   correctAttempts: number;
   streak: number;
   bestStreak: number;
-  byPosition: Record<Position, { total: number; correct: number }>;
+  byPosition: Record<string, { total: number; correct: number }>;
   byCategory: Record<SpotCategory, { total: number; correct: number }>;
   byHandType: Record<HandCategoryType, { total: number; correct: number }>;
   attemptsHistory: HandAttempt[];
+}
+
+export interface PositionMathMetrics {
+  position: Position;
+  seatsToBtn: number;
+  playersBehind: number;
+  probabilityPremiumBehind: number; // e.g. 0.32
+  gtoRfiFrequency: number; // e.g. 11.5
+  rangeStructure: RangeMorphologyStructure;
 }

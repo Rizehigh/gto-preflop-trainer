@@ -1,74 +1,128 @@
 import React from 'react';
-import { Position } from '../types/poker';
+import { Position, TableSize } from '../types/poker';
+import { calculateEllipseSeatCoordinates, calculatePositionMathMetrics, getPositionsForTableSize } from '../utils/gtoMath';
 
 interface PokerTableProps {
   heroPosition: Position;
   villainPosition?: Position;
   spotName: string;
   facingAction: string;
+  tableSize?: TableSize;
+  onTableSizeChange?: (size: TableSize) => void;
 }
 
 export const PokerTable: React.FC<PokerTableProps> = ({
   heroPosition,
   villainPosition,
   spotName,
-  facingAction
+  facingAction,
+  tableSize = 6,
+  onTableSizeChange
 }) => {
-  const positions: Position[] = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'];
-
-  const seatPositions: Record<Position, { top: string; left: string }> = {
-    UTG: { top: '80%', left: '20%' },
-    HJ: { top: '20%', left: '20%' },
-    CO: { top: '10%', left: '50%' },
-    BTN: { top: '20%', left: '80%' },
-    SB: { top: '80%', left: '80%' },
-    BB: { top: '90%', left: '50%' }
-  };
+  const positions = getPositionsForTableSize(tableSize);
+  const seatCoords = calculateEllipseSeatCoordinates(tableSize);
+  const heroMath = calculatePositionMathMetrics(heroPosition, tableSize);
 
   return (
-    <div className="relative w-full max-w-lg h-56 bg-m3-surfaceContainerLow rounded-m3-lg border-2 border-m3-outlineVariant shadow flex items-center justify-center p-4 overflow-hidden my-2">
-      {/* Table Center Info */}
-      <div className="relative z-10 text-center px-4 py-2 bg-m3-surfaceContainerHigh border border-m3-outlineVariant/80 max-w-xs shadow-sm rounded-m3-xs">
-        <div className="text-[11px] uppercase tracking-wider text-m3-primary font-bold">{spotName}</div>
-        <div className="text-xs font-semibold text-m3-onSurface mt-0.5">{facingAction}</div>
+    <div className="w-full flex flex-col items-center space-y-2">
+      
+      {/* Table Size Toggle Header */}
+      <div className="flex items-center justify-between w-full max-w-lg px-1">
+        <div className="text-[11px] font-bold text-m3-onSurfaceVariant uppercase tracking-wider flex items-center gap-1.5">
+          <span>Table Format:</span>
+          <span className="text-amber-400 font-extrabold">{tableSize}-Max</span>
+        </div>
+
+        {onTableSizeChange && (
+          <div className="flex items-center gap-1 bg-m3-surfaceContainerHigh p-0.5 rounded-m3-xs border border-m3-outlineVariant">
+            {([6, 7, 8, 9, 10] as TableSize[]).map((size) => (
+              <button
+                key={size}
+                onClick={() => onTableSizeChange(size)}
+                className={`px-2 py-0.5 text-[10px] font-extrabold rounded-m3-xs transition-colors ${
+                  tableSize === size
+                    ? 'bg-amber-500 text-zinc-950 shadow-sm'
+                    : 'text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceBright'
+                }`}
+              >
+                {size}M
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Seats around table */}
-      {positions.map((pos) => {
-        const isHero = pos === heroPosition;
-        const isVillain = pos === villainPosition;
-        const coords = seatPositions[pos];
+      {/* Dynamic Elliptical Felt Container */}
+      <div className="relative w-full max-w-lg h-60 bg-m3-surfaceContainerLow rounded-m3-lg border-2 border-m3-outlineVariant shadow flex items-center justify-center p-4 overflow-hidden my-1">
+        
+        {/* Table Felt Ring */}
+        <div className="absolute inset-4 border border-zinc-800 rounded-[80px] bg-zinc-950/40 pointer-events-none" />
 
-        return (
-          <div
-            key={pos}
-            style={{ top: coords.top, left: coords.left, transform: 'translate(-50%, -50%)' }}
-            className={`absolute flex flex-col items-center z-20 transition-all duration-150 ${
-              isHero ? 'scale-105' : isVillain ? 'scale-100' : 'opacity-60'
-            }`}
-          >
+        {/* Table Center Info */}
+        <div className="relative z-10 text-center px-3 py-2 bg-m3-surfaceContainerHigh/90 border border-m3-outlineVariant/80 max-w-[210px] shadow-sm rounded-m3-xs backdrop-blur-sm">
+          <div className="text-[11px] uppercase tracking-wider text-m3-primary font-black leading-tight">
+            {spotName}
+          </div>
+          <div className="text-[11px] font-semibold text-m3-onSurface mt-0.5 leading-tight">
+            {facingAction}
+          </div>
+
+          <div className="mt-1.5 pt-1.5 border-t border-m3-outlineVariant/60 grid grid-cols-2 gap-1 text-[10px] font-mono text-zinc-400">
+            <div>Behind: <span className="text-amber-300 font-bold">{heroMath.playersBehind}</span></div>
+            <div>GTO RFI: <span className="text-emerald-400 font-bold">{heroMath.gtoRfiFrequency}%</span></div>
+          </div>
+        </div>
+
+        {/* Seats around table */}
+        {positions.map((pos, idx) => {
+          const isHero = pos === heroPosition;
+          const isVillain = pos === villainPosition;
+          const coords = seatCoords[idx];
+
+          return (
             <div
-              className={`px-3 py-1 text-xs font-bold shadow flex items-center gap-1.5 border rounded-m3-xs ${
-                isHero
-                  ? 'bg-m3-primaryContainer text-m3-onPrimaryContainer border-m3-primary ring-2 ring-m3-primary/40'
-                  : isVillain
-                  ? 'bg-amber-950 text-amber-200 border-amber-500'
-                  : 'bg-m3-surfaceContainerHighest text-m3-onSurfaceVariant border-m3-outlineVariant'
+              key={pos}
+              style={{
+                top: `${coords.y}%`,
+                left: `${coords.x}%`,
+                transform: 'translate(-50%, -50%)'
+              }}
+              className={`absolute flex flex-col items-center z-20 transition-all duration-200 ${
+                isHero ? 'scale-105 z-30' : isVillain ? 'scale-100 z-25' : 'opacity-70'
               }`}
             >
-              <span>{pos}</span>
-              {isHero && <span className="text-[9px] bg-m3-primary text-m3-onPrimary px-1 rounded-m3-xs uppercase font-extrabold">Hero</span>}
-              {isVillain && <span className="text-[9px] bg-amber-500 text-black px-1 rounded-m3-xs uppercase font-extrabold">Opener</span>}
-            </div>
-
-            {pos === 'BTN' && (
-              <div className="mt-1 w-4 h-4 bg-amber-400 text-black text-[9px] font-black rounded-m3-xs flex items-center justify-center shadow">
-                D
+              <div
+                className={`px-2.5 py-1 text-[11px] font-bold shadow flex items-center gap-1 border rounded-m3-xs ${
+                  isHero
+                    ? 'bg-m3-primaryContainer text-m3-onPrimaryContainer border-amber-400 ring-2 ring-amber-400/50'
+                    : isVillain
+                    ? 'bg-red-950 text-red-200 border-red-500'
+                    : 'bg-m3-surfaceContainerHighest text-m3-onSurfaceVariant border-m3-outlineVariant'
+                }`}
+              >
+                <span>{pos}</span>
+                {isHero && (
+                  <span className="text-[9px] bg-amber-400 text-zinc-950 px-1 rounded-m3-xs uppercase font-extrabold">
+                    Hero
+                  </span>
+                )}
+                {isVillain && (
+                  <span className="text-[9px] bg-red-600 text-white px-1 rounded-m3-xs uppercase font-extrabold">
+                    Villain
+                  </span>
+                )}
               </div>
-            )}
-          </div>
-        );
-      })}
+
+              {pos === 'BTN' && (
+                <div className="mt-0.5 w-3.5 h-3.5 bg-amber-400 text-black text-[9px] font-black rounded-m3-xs flex items-center justify-center shadow">
+                  D
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
     </div>
   );
 };

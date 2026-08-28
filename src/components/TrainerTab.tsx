@@ -306,7 +306,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                   disabled={userAction !== null && currentSpot.allowedActions.includes('call')}
                   className={`w-full py-3 px-4 rounded-m3-xs font-black text-xs transition-all flex flex-col items-center justify-center border shadow relative ${
                     !currentSpot.allowedActions.includes('call')
-                      ? 'bg-zinc-900 text-amber-300/80 border-amber-500/40 cursor-help hover:border-amber-400 hover:bg-zinc-850 hover:text-amber-200'
+                      ? 'bg-zinc-900 text-zinc-500 border-zinc-800 opacity-50 cursor-help hover:border-zinc-700 hover:text-zinc-300'
                       : userAction === 'call'
                       ? 'bg-emerald-600 border-white text-white ring-2 ring-white'
                       : 'bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-500'
@@ -316,11 +316,15 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                   <div className="flex items-center gap-1">
                     <span>CALL</span>
                     {!currentSpot.allowedActions.includes('call') && (
-                      <HelpCircle className="w-3.5 h-3.5 text-amber-400 shrink-0 animate-pulse" />
+                      <HelpCircle className="w-3 h-3 text-zinc-500 shrink-0" />
                     )}
                   </div>
-                  <span className="text-[10px] font-normal mt-0.5 text-amber-400/90">
-                    {!currentSpot.allowedActions.includes('call') ? '(Disabled - Why?)' : '(Key 2)'}
+                  <span className={`text-[10px] font-normal mt-0.5 ${
+                    !currentSpot.allowedActions.includes('call')
+                      ? 'text-zinc-500'
+                      : 'text-emerald-200'
+                  }`}>
+                    {!currentSpot.allowedActions.includes('call') ? '(Disabled)' : '(Key 2)'}
                   </span>
                 </button>
               </div>
@@ -341,21 +345,9 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               </button>
             </div>
 
-            {/* Helper link when calling is disabled */}
-            {!currentSpot.allowedActions.includes('call') && (
-              <button
-                type="button"
-                onClick={() => setShowCallDisabledInfo((prev) => !prev)}
-                className="w-full text-center text-[11px] text-amber-400/90 hover:text-amber-300 flex items-center justify-center gap-1 py-1 font-semibold transition-colors"
-              >
-                <HelpCircle className="w-3.5 h-3.5 shrink-0" />
-                <span>Why is CALL disabled in {formatPositionLabel(currentSpot.heroPosition)} {currentSpot.category === 'rfi' ? 'RFI' : ''}?</span>
-              </button>
-            )}
-
             {/* Call Disabled Context Card */}
             {!currentSpot.allowedActions.includes('call') && (isCallHovered || showCallDisabledInfo) && (
-              <div className="mt-3 p-3.5 bg-zinc-900/95 border border-amber-500/50 rounded-m3-xs text-left text-xs space-y-2 shadow-xl animate-fadeIn relative">
+              <div className="mt-3 p-3.5 bg-zinc-900 border border-zinc-700 rounded-m3-xs text-left text-xs space-y-2 shadow-xl animate-fadeIn relative">
                 <button 
                   type="button"
                   onClick={() => setShowCallDisabledInfo(false)}

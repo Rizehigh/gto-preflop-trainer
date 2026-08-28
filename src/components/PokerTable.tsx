@@ -10,6 +10,7 @@ interface PokerTableProps {
   tableSize?: TableSize;
   onTableSizeChange?: (size: TableSize) => void;
   onSelectSeat?: (position: Position) => void;
+  compact?: boolean;
 }
 
 export const PokerTable: React.FC<PokerTableProps> = ({
@@ -19,7 +20,8 @@ export const PokerTable: React.FC<PokerTableProps> = ({
   facingAction,
   tableSize = 6,
   onTableSizeChange,
-  onSelectSeat
+  onSelectSeat,
+  compact = false
 }) => {
   const positions = getPositionsForTableSize(tableSize);
   const seatCoords = calculateEllipseSeatCoordinates(tableSize);
@@ -55,13 +57,19 @@ export const PokerTable: React.FC<PokerTableProps> = ({
       </div>
 
       {/* Dynamic Elliptical Felt Container */}
-      <div className="relative w-full max-w-xl md:max-w-2xl lg:max-w-3xl h-64 sm:h-72 md:h-80 lg:h-96 bg-m3-surfaceContainerLow rounded-m3-lg border-2 border-m3-outlineVariant shadow flex items-center justify-center p-4 overflow-hidden my-1">
+      <div className={`relative w-full transition-all duration-300 bg-m3-surfaceContainerLow rounded-m3-lg border-2 border-m3-outlineVariant shadow flex items-center justify-center p-4 overflow-hidden my-1 ${
+        compact
+          ? 'max-w-lg h-44 sm:h-48 md:h-52 lg:h-56'
+          : 'max-w-xl md:max-w-2xl lg:max-w-3xl h-64 sm:h-72 md:h-80 lg:h-96'
+      }`}>
         
         {/* Table Felt Ring */}
         <div className="absolute inset-4 border border-zinc-800 rounded-[80px] bg-zinc-950/40 pointer-events-none" />
 
         {/* Table Center Info */}
-        <div className="relative z-10 text-center px-3 py-2 bg-m3-surfaceContainerHigh/90 border border-m3-outlineVariant/80 max-w-[210px] shadow-sm rounded-m3-xs backdrop-blur-sm">
+        <div className={`relative z-10 text-center px-2.5 py-1.5 bg-m3-surfaceContainerHigh/90 border border-m3-outlineVariant/80 shadow-sm rounded-m3-xs backdrop-blur-sm transition-all ${
+          compact ? 'max-w-[160px] text-[10px]' : 'max-w-[210px] text-xs'
+        }`}>
           <div className="text-[11px] uppercase tracking-wider text-m3-primary font-black leading-tight">
             {spotName}
           </div>

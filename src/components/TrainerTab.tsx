@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ActionType, Card, HandAttempt, Position, SpotDefinition, TableSize } from '../types/poker';
 import { SPOT_DEFINITIONS } from '../data/gtoRanges';
 import { classifyHandType, dealCardsForNotation, evaluateUserAction, formatPositionLabel, getAll169Hands, getMorphologyStructureMeta } from '../utils/pokerUtils';
@@ -28,6 +28,15 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const [showPositionalMatrix, setShowPositionalMatrix] = useState<boolean>(false);
   const [showCallDisabledInfo, setShowCallDisabledInfo] = useState<boolean>(false);
   const [isCallHovered, setIsCallHovered] = useState<boolean>(false);
+  const solutionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (userAction !== null || showHint) {
+      setTimeout(() => {
+        solutionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 50);
+    }
+  }, [userAction, showHint]);
 
   const [evaluation, setEvaluation] = useState<{
     isCorrect: boolean;
@@ -214,7 +223,9 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         
         {/* Left Column: Poker Table & Action Controls */}
-        <div className="lg:col-span-6 flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 shadow-sm relative">
+        <div className={`flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 sm:p-6 shadow-sm relative transition-all duration-300 ${
+          userAction !== null || showHint ? 'lg:col-span-5' : 'lg:col-span-6'
+        }`}>
           
           <PokerTable
             heroPosition={currentSpot.heroPosition}
@@ -224,6 +235,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             tableSize={tableSize}
             onTableSizeChange={setTableSize}
             onSelectSeat={() => setShowPositionalMatrix(true)}
+            compact={userAction !== null || showHint}
           />
 
           <div className="my-5 flex items-center justify-center gap-4">
@@ -389,7 +401,9 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
         </div>
 
         {/* Right Column: Solution Grid & Morphology Feedback */}
-        <div className="lg:col-span-6 space-y-4 flex flex-col items-center w-full">
+        <div ref={solutionRef} className={`space-y-4 flex flex-col items-center w-full transition-all duration-300 ${
+          userAction !== null || showHint ? 'lg:col-span-7' : 'lg:col-span-6'
+        }`}>
           {userAction === null && !showHint ? (
             /* Pre-Decision Locked State */
             <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 text-center space-y-4 shadow">

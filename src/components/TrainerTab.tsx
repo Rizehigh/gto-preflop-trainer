@@ -381,19 +381,19 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
           </div>
         </div>
 
-        {/* Right Column: GTO Solution & 13x13 Range Grid Matrix */}
+        {/* Right Column: GTO Solution & Dual 13x13 Range Grid Matrices */}
         <div className="lg:col-span-6 flex flex-col items-center w-full space-y-4">
           {userAction === null && !showHint ? (
-            /* Pre-Decision State: Range Grid Hidden / Locked */
+            /* Pre-Decision State: Range Grids Hidden / Locked */
             <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 text-center space-y-4 shadow">
               <div className="w-12 h-12 bg-m3-surfaceContainerHigh border border-m3-outlineVariant rounded-m3-xs flex items-center justify-center mx-auto text-amber-400 shadow-sm">
                 <Lock className="w-6 h-6" />
               </div>
               
               <div>
-                <h3 className="text-base font-bold text-m3-onSurface">GTO Range Matrix Hidden</h3>
+                <h3 className="text-base font-bold text-m3-onSurface">GTO Range Matrices Hidden</h3>
                 <p className="text-xs text-m3-onSurfaceVariant font-medium mt-1 max-w-sm mx-auto leading-relaxed">
-                  Make your play (Fold, Call, or Raise) to test your skills and unlock the full 13x13 GTO range solution matrix!
+                  Make your play (Fold, Call, or Raise) to test your skills and unlock the full 13x13 GTO Hero & Villain range matrices!
                 </p>
               </div>
 
@@ -415,14 +415,14 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
 
                 <ul className="text-xs text-m3-onSurfaceVariant space-y-2 font-medium list-disc list-inside">
                   <li><strong className="text-m3-onSurface">Test Decision:</strong> Select Fold, Call, or Raise for Hero using your mouse or keys 1/2/3.</li>
-                  <li><strong className="text-m3-onSurface">Range Morphology:</strong> Master whether this spot demands a Linear, Polarized, or Mixed strategy.</li>
-                  <li><strong className="text-m3-onSurface">Hint Shortcut:</strong> Press <kbd className="px-1 py-0.5 bg-zinc-800 text-amber-400 rounded font-mono text-[10px]">H</kbd> anytime to reveal the GTO hint.</li>
+                  <li><strong className="text-m3-onSurface">Hero & Villain Ranges:</strong> Compare Hero's defense/raise strategy directly against Villain's opening range.</li>
+                  <li><strong className="text-m3-onSurface">Hint Shortcut:</strong> Press <kbd className="px-1 py-0.5 bg-zinc-800 text-amber-400 rounded font-mono text-[10px]">H</kbd> anytime to reveal GTO ranges.</li>
                 </ul>
               </div>
             </div>
           ) : (
-            /* Post-Decision State: Revealed 13x13 Range Grid & GTO Solution Feedback */
-            <div className="w-full space-y-4 animate-fadeIn">
+            /* Post-Decision State: Revealed Hero & Villain 13x13 Range Grids & GTO Feedback */
+            <div className="w-full space-y-5 animate-fadeIn">
               {evaluation && (
                 <MorphologyExplanation
                   isCorrect={evaluation.isCorrect}
@@ -438,14 +438,14 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                 />
               )}
 
-              {/* Full Original 13x13 GTO Range Matrix */}
+              {/* HERO 13x13 GTO RANGE MATRIX */}
               <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs uppercase font-extrabold tracking-wider text-m3-onSurface">
-                      GTO Matrix Morphology:
+                    <span className="text-xs uppercase font-extrabold tracking-wider text-amber-400 font-mono">
+                      HERO RANGE ({currentSpot.heroPosition}):
                     </span>
-                    <span className={`px-2 py-0.5 font-black text-[11px] uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
+                    <span className={`px-2 py-0.5 font-black text-[10px] uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
                       {morphologyMeta.label}
                     </span>
                   </div>
@@ -459,7 +459,37 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                   <RangeGrid
                     spot={currentSpot}
                     highlightHand={handNotation}
-                    title={`GTO Range Matrix: ${currentSpot.name}`}
+                    overrideTarget="hero"
+                    title={`Hero GTO Matrix (${currentSpot.heroPosition})`}
+                    showLegend
+                  />
+                </div>
+              </div>
+
+              {/* VILLAIN 13x13 GTO RANGE MATRIX */}
+              <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs uppercase font-extrabold tracking-wider text-red-400 font-mono">
+                      VILLAIN RANGE ({currentSpot.villainPosition || 'OPENER'}):
+                    </span>
+                    {currentSpot.villainMorphologyStructure && (
+                      <span className="px-2 py-0.5 font-black text-[10px] uppercase tracking-wide border rounded-m3-xs bg-red-950/80 text-red-300 border-red-500">
+                        {currentSpot.villainMorphologyStructure}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <p className="text-xs font-medium text-m3-onSurfaceVariant leading-snug">
+                  {currentSpot.villainMorphologyDescription || `Preflop opening / raising range structure for ${currentSpot.villainPosition || 'Villain'}.`}
+                </p>
+
+                <div className="pt-2 border-t border-m3-outlineVariant">
+                  <RangeGrid
+                    spot={currentSpot}
+                    overrideTarget="villain"
+                    title={`Villain GTO Matrix (${currentSpot.villainPosition || 'Opener'})`}
                     showLegend
                   />
                 </div>

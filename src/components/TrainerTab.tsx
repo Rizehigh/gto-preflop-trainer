@@ -28,15 +28,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const [showPositionalMatrix, setShowPositionalMatrix] = useState<boolean>(false);
   const [showCallDisabledInfo, setShowCallDisabledInfo] = useState<boolean>(false);
   const [isCallHovered, setIsCallHovered] = useState<boolean>(false);
-  const solutionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (userAction !== null || showHint) {
-      setTimeout(() => {
-        solutionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 50);
-    }
-  }, [userAction, showHint]);
+  const [showRangeMatrix, setShowRangeMatrix] = useState<boolean>(false);
 
   const [evaluation, setEvaluation] = useState<{
     isCorrect: boolean;
@@ -223,9 +215,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         
         {/* Left Column: Poker Table & Action Controls */}
-        <div className={`flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 sm:p-6 shadow-sm relative transition-all duration-300 ${
-          userAction !== null || showHint ? 'lg:col-span-5' : 'lg:col-span-6'
-        }`}>
+        <div className="lg:col-span-6 flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-5 shadow-sm relative">
           
           <PokerTable
             heroPosition={currentSpot.heroPosition}
@@ -235,7 +225,6 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             tableSize={tableSize}
             onTableSizeChange={setTableSize}
             onSelectSeat={() => setShowPositionalMatrix(true)}
-            compact={userAction !== null || showHint}
           />
 
           <div className="my-5 flex items-center justify-center gap-4">
@@ -401,9 +390,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
         </div>
 
         {/* Right Column: Solution Grid & Morphology Feedback */}
-        <div ref={solutionRef} className={`space-y-4 flex flex-col items-center w-full transition-all duration-300 ${
-          userAction !== null || showHint ? 'lg:col-span-7' : 'lg:col-span-6'
-        }`}>
+        <div className="lg:col-span-6 space-y-4 flex flex-col items-center w-full">
           {userAction === null && !showHint ? (
             /* Pre-Decision Locked State */
             <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 text-center space-y-4 shadow">
@@ -459,28 +446,40 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                 />
               )}
 
+              {/* Collapsible 13x13 Range Matrix */}
               <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow overflow-hidden space-y-3">
-                {/* Range Morphology Structure Header */}
-                <div className={`p-3 rounded-m3-xs border flex flex-col gap-1 ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
-                  <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
                     <span className="text-xs uppercase font-extrabold tracking-wider text-m3-onSurface">
-                      Spot Range Morphology
+                      Spot Range Morphology:
                     </span>
-                    <span className={`px-2.5 py-0.5 font-black text-xs uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.borderColor}`}>
+                    <span className={`px-2 py-0.5 font-black text-[11px] uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
                       {morphologyMeta.label}
                     </span>
                   </div>
-                  <p className="text-xs font-semibold text-zinc-300 leading-snug mt-0.5">
-                    {currentSpot.morphologyDescription}
-                  </p>
+
+                  <button
+                    onClick={() => setShowRangeMatrix(prev => !prev)}
+                    className="px-3 py-1 bg-m3-surfaceContainerHigh hover:bg-m3-surfaceBright border border-m3-outlineVariant text-m3-onSurface rounded-m3-xs text-xs font-bold transition-all flex items-center gap-1.5"
+                  >
+                    <span>{showRangeMatrix ? 'Hide 13x13 Matrix' : 'Show 13x13 Matrix'}</span>
+                  </button>
                 </div>
 
-                <RangeGrid
-                  spot={currentSpot}
-                  highlightHand={handNotation}
-                  title={`GTO Matrix: ${currentSpot.name}`}
-                  showLegend
-                />
+                <p className="text-xs font-medium text-m3-onSurfaceVariant leading-snug">
+                  {currentSpot.morphologyDescription}
+                </p>
+
+                {showRangeMatrix && (
+                  <div className="pt-2 border-t border-m3-outlineVariant animate-fadeIn">
+                    <RangeGrid
+                      spot={currentSpot}
+                      highlightHand={handNotation}
+                      title={`GTO Matrix: ${currentSpot.name}`}
+                      showLegend
+                    />
+                  </div>
+                )}
               </div>
             </>
           )}

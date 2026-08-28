@@ -37,7 +37,7 @@ export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
   const foldPct = Math.round((frequencies?.fold || 0) * 100);
 
   return (
-    <div className="w-full max-w-xl bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-5 shadow-lg space-y-4 animate-fadeIn my-2">
+    <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 sm:p-5 shadow-lg space-y-4 animate-fadeIn">
       {/* Header Feedback Banner */}
       <div
         className={`p-4 rounded-m3-sm border flex items-center justify-between shadow-sm ${

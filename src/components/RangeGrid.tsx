@@ -11,6 +11,7 @@ interface RangeGridProps {
   showLegend?: boolean;
   filterAction?: 'all' | 'raise' | 'call' | 'mixed';
   compact?: boolean;
+  overrideTarget?: 'hero' | 'villain';
 }
 
 export const RangeGrid: React.FC<RangeGridProps> = ({
@@ -19,9 +20,11 @@ export const RangeGrid: React.FC<RangeGridProps> = ({
   title,
   showLegend = true,
   filterAction = 'all',
-  compact = false
+  compact = false,
+  overrideTarget
 }) => {
-  const [viewTarget, setViewTarget] = useState<'hero' | 'villain'>('hero');
+  const [viewTargetState, setViewTarget] = useState<'hero' | 'villain'>('hero');
+  const viewTarget = overrideTarget || viewTargetState;
   const [selectedHand, setSelectedHand] = useState<{ notation: string; freq: ActionFrequencies } | null>(null);
 
   const activeRanges = (viewTarget === 'villain' && spot.villainRange) ? spot.villainRange : spot.ranges;

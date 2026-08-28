@@ -8,7 +8,7 @@ import { PlayingCard } from './PlayingCard';
 import { MorphologyExplanation } from './MorphologyExplanation';
 import { RangeGrid } from './RangeGrid';
 import { PositionalHandMatrixModal } from './PositionalHandMatrixModal';
-import { Filter, RefreshCw, ShieldAlert, Lock, Eye, GraduationCap, Lightbulb, Users, UserCheck } from 'lucide-react';
+import { Filter, RefreshCw, ShieldAlert, Lock, Eye, GraduationCap, Lightbulb, Users, UserCheck, HelpCircle, Info, X } from 'lucide-react';
 
 interface TrainerTabProps {
   onRecordAttempt: (attempt: HandAttempt) => void;
@@ -26,6 +26,8 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const [showHint, setShowHint] = useState<boolean>(false);
   const [tableSize, setTableSize] = useState<TableSize>(6);
   const [showPositionalMatrix, setShowPositionalMatrix] = useState<boolean>(false);
+  const [showCallDisabledInfo, setShowCallDisabledInfo] = useState<boolean>(false);
+  const [isCallHovered, setIsCallHovered] = useState<boolean>(false);
 
   const [evaluation, setEvaluation] = useState<{
     isCorrect: boolean;
@@ -59,6 +61,8 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
     setUserAction(null);
     setEvaluation(null);
     setShowHint(false);
+    setShowCallDisabledInfo(false);
+    setIsCallHovered(false);
 
     sounds.playCardDeal();
   }, [selectedSpotId, selectedCategory, leakPosition]);
@@ -112,7 +116,13 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
 
       if (userAction === null) {
         if (e.key === '1') handleActionPick('fold');
-        if (e.key === '2' && currentSpot.allowedActions.includes('call')) handleActionPick('call');
+        if (e.key === '2') {
+          if (currentSpot.allowedActions.includes('call')) {
+            handleActionPick('call');
+          } else {
+            setShowCallDisabledInfo((prev) => !prev);
+          }
+        }
         if (e.key === '3') handleActionPick('raise');
       } else {
         if (e.key === ' ' || e.key === 'Enter') {
@@ -264,23 +274,59 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               </button>
 
               {/* CALL BUTTON */}
-              <button
-                onClick={() => handleActionPick('call')}
-                disabled={userAction !== null || !currentSpot.allowedActions.includes('call')}
-                className={`py-3 px-4 rounded-m3-xs font-black text-xs transition-all flex flex-col items-center justify-center border shadow ${
-                  !currentSpot.allowedActions.includes('call')
-                    ? 'bg-zinc-900 text-zinc-600 border-zinc-800 opacity-40 cursor-not-allowed'
-                    : userAction === 'call'
-                    ? 'bg-emerald-600 border-white text-white ring-2 ring-white'
-                    : 'bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-500'
-                }`}
+              <div
+                className="relative"
+                onMouseEnter={() => {
+                  if (!currentSpot.allowedActions.includes('call')) {
+                    setIsCallHovered(true);
+                  }
+                }}
+                onMouseLeave={() => {
+                  setIsCallHovered(false);
+                }}
+                onClick={() => {
+                  if (!currentSpot.allowedActions.includes('call')) {
+                    setShowCallDisabledInfo((prev) => !prev);
+                  }
+                }}
               >
-                <span>CALL</span>
-                <span className="text-[10px] text-emerald-200 font-normal mt-0.5">(Key 2)</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    if (currentSpot.allowedActions.includes('call')) {
+                      if (userAction === null) {
+                        handleActionPick('call');
+                      }
+                    } else {
+                      e.stopPropagation();
+                      setShowCallDisabledInfo((prev) => !prev);
+                    }
+                  }}
+                  disabled={userAction !== null && currentSpot.allowedActions.includes('call')}
+                  className={`w-full py-3 px-4 rounded-m3-xs font-black text-xs transition-all flex flex-col items-center justify-center border shadow relative ${
+                    !currentSpot.allowedActions.includes('call')
+                      ? 'bg-zinc-900 text-amber-300/80 border-amber-500/40 cursor-help hover:border-amber-400 hover:bg-zinc-850 hover:text-amber-200'
+                      : userAction === 'call'
+                      ? 'bg-emerald-600 border-white text-white ring-2 ring-white'
+                      : 'bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-500'
+                  }`}
+                  title={!currentSpot.allowedActions.includes('call') ? "Hover, click, or press '2' for GTO context on why calling is disabled" : ""}
+                >
+                  <div className="flex items-center gap-1">
+                    <span>CALL</span>
+                    {!currentSpot.allowedActions.includes('call') && (
+                      <HelpCircle className="w-3.5 h-3.5 text-amber-400 shrink-0 animate-pulse" />
+                    )}
+                  </div>
+                  <span className="text-[10px] font-normal mt-0.5 text-amber-400/90">
+                    {!currentSpot.allowedActions.includes('call') ? '(Disabled - Why?)' : '(Key 2)'}
+                  </span>
+                </button>
+              </div>
 
               {/* RAISE BUTTON */}
               <button
+                type="button"
                 onClick={() => handleActionPick('raise')}
                 disabled={userAction !== null}
                 className={`py-3 px-4 rounded-m3-xs font-black text-xs transition-all flex flex-col items-center justify-center border shadow ${
@@ -293,6 +339,52 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                 <span className="text-[10px] text-red-200 font-normal mt-0.5">(Key 3)</span>
               </button>
             </div>
+
+            {/* Helper link when calling is disabled */}
+            {!currentSpot.allowedActions.includes('call') && (
+              <button
+                type="button"
+                onClick={() => setShowCallDisabledInfo((prev) => !prev)}
+                className="w-full text-center text-[11px] text-amber-400/90 hover:text-amber-300 flex items-center justify-center gap-1 py-1 font-semibold transition-colors"
+              >
+                <HelpCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>Why is CALL disabled in {formatPositionLabel(currentSpot.heroPosition)} {currentSpot.category === 'rfi' ? 'RFI' : ''}?</span>
+              </button>
+            )}
+
+            {/* Call Disabled Context Card */}
+            {!currentSpot.allowedActions.includes('call') && (isCallHovered || showCallDisabledInfo) && (
+              <div className="mt-3 p-3.5 bg-zinc-900/95 border border-amber-500/50 rounded-m3-xs text-left text-xs space-y-2 shadow-xl animate-fadeIn relative">
+                <button 
+                  type="button"
+                  onClick={() => setShowCallDisabledInfo(false)}
+                  className="absolute top-2.5 right-2.5 text-zinc-400 hover:text-zinc-200 p-0.5"
+                  title="Close message"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+                
+                <div className="flex items-start gap-2.5">
+                  <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="space-y-1.5 pr-4">
+                    <div className="font-bold text-amber-300 text-xs">
+                      Why is CALL disabled in {formatPositionLabel(currentSpot.heroPosition)} {currentSpot.category === 'rfi' ? 'RFI' : ''}?
+                    </div>
+                    <p className="text-zinc-300 text-[11px] leading-relaxed">
+                      <strong className="text-white">GTO Standard:</strong> In unopened preflop pots from early & late positions ({formatPositionLabel(currentSpot.heroPosition)}), GTO mandates a strict <em>Raise-or-Fold</em> strategy. Open-calling (limping) forfeits pot initiative, gives away preflop equity, and invites players behind to squeeze or over-realize equity.
+                    </p>
+                    <div className="border-t border-zinc-800 pt-1.5 mt-1 text-[11px] leading-relaxed text-zinc-300">
+                      <span className="font-bold text-emerald-400">When CAN calling be a valid choice?</span>
+                      <ul className="list-disc list-inside mt-1 space-y-1 text-zinc-300 text-[10.5px]">
+                        <li><strong className="text-zinc-100">Small Blind Open:</strong> SB uses a mixed limp/raise strategy against the BB due to discounted pot odds.</li>
+                        <li><strong className="text-zinc-100">Facing Opens / 3-Bets:</strong> Defending in position (e.g. BTN vs UTG open) or defending the Big Blind.</li>
+                        <li><strong className="text-zinc-100">Exploitative Play:</strong> In loose/passive games with weak players behind who rarely squeeze, multiway limping/flatting with speculative hands (small pocket pairs, suited connectors) can yield high implied odds.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

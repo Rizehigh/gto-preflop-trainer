@@ -52,11 +52,11 @@ Unlike traditional flashcard tools, this trainer focuses on **Hand Morphology** 
 ## 💾 How Data Retention Works
 
 1. **Local Browser Isolation**:
-   Your progress (total attempts, accuracy %, current streak, positional leaks, and hand history) is stored directly in your browser's `window.localStorage`.
+   Your progress (total attempts, accuracy %, current streak, positional leaks, and hand history) is stored directly in your browser's `window.localStorage`. 
 2. **Multi-Session Continuity**:
    You can close the tab or browser anytime and return days later — your statistics, best streak, and leak history will automatically reload.
 3. **Privacy-First**:
-   No login, account creation, or server tracking is required. Each browser/device maintains its own isolated data set.
+   No login, account creation, or server tracking is required. Each browser/device maintains its own isolated data set. Data is cleared automatically after 365 days of inactivity.
 
 ---
 

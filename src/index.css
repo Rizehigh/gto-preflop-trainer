@@ -8,35 +8,42 @@
   }
 }
 
-/* Material Design 3 State Layer & Elevation Utilities */
+/* Crisp Dark Material 3 Design System - Sharp & High Contrast */
+body {
+  background-color: #0d0e12;
+  color: #f3f4f6;
+  font-family: 'Roboto Flex', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
 .m3-card-elevated {
-  @apply bg-m3-surfaceContainerLow border border-m3-outlineVariant/40 rounded-m3-xl shadow-md transition-shadow hover:shadow-lg;
+  @apply bg-m3-surfaceContainerLow border border-m3-outlineVariant/60 rounded-m3-sm shadow-md transition-shadow hover:shadow-lg;
 }
 
 .m3-card-filled {
-  @apply bg-m3-surfaceContainerHigh rounded-m3-xl border border-transparent;
+  @apply bg-m3-surfaceContainerHigh rounded-m3-sm border border-m3-outlineVariant/40;
 }
 
 .m3-card-outlined {
-  @apply bg-m3-surfaceContainer rounded-m3-xl border border-m3-outlineVariant;
+  @apply bg-m3-surfaceContainer rounded-m3-sm border border-m3-outlineVariant;
 }
 
 .m3-button-filled {
-  @apply bg-m3-primary text-m3-onPrimary font-medium rounded-m3-full px-6 py-2.5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none;
+  @apply bg-m3-primary text-m3-onPrimary font-semibold rounded-m3-sm px-5 py-2 shadow transition-all hover:bg-blue-400 active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none;
 }
 
 .m3-button-tonal {
-  @apply bg-m3-secondaryContainer text-m3-onSecondaryContainer font-medium rounded-m3-full px-6 py-2.5 transition-all hover:bg-m3-secondaryContainer/80 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none;
+  @apply bg-m3-surfaceContainerHigh text-m3-onSurface font-semibold rounded-m3-sm px-5 py-2 transition-all hover:bg-m3-surfaceBright active:scale-[0.99] border border-m3-outlineVariant/50 disabled:opacity-40 disabled:pointer-events-none;
 }
 
 .m3-button-outlined {
-  @apply border border-m3-outline text-m3-primary font-medium rounded-m3-full px-6 py-2.5 hover:bg-m3-primary/10 transition-all active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none;
+  @apply border border-m3-outline text-m3-onSurface font-semibold rounded-m3-sm px-5 py-2 hover:bg-m3-surfaceContainerHigh transition-all active:scale-[0.99] disabled:opacity-40 disabled:pointer-events-none;
 }
 
 .m3-chip {
-  @apply px-3 py-1 rounded-m3-sm text-xs font-medium border border-m3-outlineVariant bg-m3-surfaceContainerHigh text-m3-onSurfaceVariant flex items-center gap-1.5 transition-colors;
+  @apply px-3 py-1 rounded-m3-xs text-xs font-semibold border border-m3-outlineVariant bg-m3-surfaceContainerHigh text-m3-onSurfaceVariant flex items-center gap-1.5 transition-colors;
 }
 
 .m3-chip-selected {
-  @apply bg-m3-secondaryContainer text-m3-onSecondaryContainer border-m3-secondaryContainer font-semibold;
+  @apply bg-m3-primaryContainer text-m3-onPrimaryContainer border-m3-primary font-semibold;
 }

@@ -26,10 +26,10 @@ export const PokerTable: React.FC<PokerTableProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-lg h-56 bg-m3-surfaceContainerLow rounded-m3-full border-4 border-m3-outlineVariant/50 shadow-md flex items-center justify-center p-4 overflow-hidden my-2">
+    <div className="relative w-full max-w-lg h-56 bg-m3-surfaceContainerLow rounded-m3-lg border-2 border-m3-outlineVariant shadow flex items-center justify-center p-4 overflow-hidden my-2">
       {/* Table Center Info */}
-      <div className="relative z-10 text-center px-4 py-2 bg-m3-surfaceContainerHigh/90 rounded-m3-lg border border-m3-outlineVariant/40 backdrop-blur-sm max-w-xs shadow-sm">
-        <div className="text-[11px] uppercase tracking-wider text-m3-primary font-medium">{spotName}</div>
+      <div className="relative z-10 text-center px-4 py-2 bg-m3-surfaceContainerHigh border border-m3-outlineVariant/80 max-w-xs shadow-sm rounded-m3-xs">
+        <div className="text-[11px] uppercase tracking-wider text-m3-primary font-bold">{spotName}</div>
         <div className="text-xs font-semibold text-m3-onSurface mt-0.5">{facingAction}</div>
       </div>
 
@@ -43,26 +43,26 @@ export const PokerTable: React.FC<PokerTableProps> = ({
           <div
             key={pos}
             style={{ top: coords.top, left: coords.left, transform: 'translate(-50%, -50%)' }}
-            className={`absolute flex flex-col items-center z-20 transition-all duration-200 ${
-              isHero ? 'scale-105' : isVillain ? 'scale-100' : 'opacity-50 scale-90'
+            className={`absolute flex flex-col items-center z-20 transition-all duration-150 ${
+              isHero ? 'scale-105' : isVillain ? 'scale-100' : 'opacity-60'
             }`}
           >
             <div
-              className={`px-3 py-1 rounded-m3-full text-xs font-semibold shadow flex items-center gap-1.5 border ${
+              className={`px-3 py-1 text-xs font-bold shadow flex items-center gap-1.5 border rounded-m3-xs ${
                 isHero
-                  ? 'bg-m3-primaryContainer text-m3-onPrimaryContainer border-m3-primary ring-2 ring-m3-primary/30'
+                  ? 'bg-m3-primaryContainer text-m3-onPrimaryContainer border-m3-primary ring-2 ring-m3-primary/40'
                   : isVillain
-                  ? 'bg-m3-tertiaryContainer text-m3-onTertiaryContainer border-m3-tertiary'
-                  : 'bg-m3-surfaceContainerHighest text-m3-onSurfaceVariant border-m3-outlineVariant/40'
+                  ? 'bg-amber-950 text-amber-200 border-amber-500'
+                  : 'bg-m3-surfaceContainerHighest text-m3-onSurfaceVariant border-m3-outlineVariant'
               }`}
             >
               <span>{pos}</span>
-              {isHero && <span className="text-[9px] bg-m3-onPrimaryContainer text-m3-primaryContainer px-1 rounded-m3-xs uppercase font-bold">Hero</span>}
-              {isVillain && <span className="text-[9px] bg-m3-onTertiaryContainer text-m3-tertiaryContainer px-1 rounded-m3-xs uppercase font-bold">Opener</span>}
+              {isHero && <span className="text-[9px] bg-m3-primary text-m3-onPrimary px-1 rounded-m3-xs uppercase font-extrabold">Hero</span>}
+              {isVillain && <span className="text-[9px] bg-amber-500 text-black px-1 rounded-m3-xs uppercase font-extrabold">Opener</span>}
             </div>
 
             {pos === 'BTN' && (
-              <div className="mt-1 w-4 h-4 bg-m3-onSurface text-m3-surface text-[9px] font-black rounded-m3-full flex items-center justify-center shadow">
+              <div className="mt-1 w-4 h-4 bg-amber-400 text-black text-[9px] font-black rounded-m3-xs flex items-center justify-center shadow">
                 D
               </div>
             )}

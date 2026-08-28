@@ -8,57 +8,53 @@ export default {
     extend: {
       colors: {
         m3: {
-          surface: '#111413',
-          surfaceDim: '#111413',
-          surfaceBright: '#373a38',
-          surfaceContainerLowest: '#0c0f0e',
-          surfaceContainerLow: '#191c1b',
-          surfaceContainer: '#1d201f',
-          surfaceContainerHigh: '#282b29',
-          surfaceContainerHighest: '#323634',
-          onSurface: '#e1e3e0',
-          onSurfaceVariant: '#c1c8c3',
-          outline: '#8b938d',
-          outlineVariant: '#414943',
+          surface: '#0d0e12',
+          surfaceContainerLow: '#14161d',
+          surfaceContainer: '#1a1d26',
+          surfaceContainerHigh: '#212530',
+          surfaceContainerHighest: '#2a2f3d',
+          surfaceBright: '#343a4b',
           
-          primary: '#71dcba',
-          onPrimary: '#003828',
-          primaryContainer: '#00513c',
-          onPrimaryContainer: '#8ef9d5',
+          primary: '#60a5fa',           // Crisp Soft Blue
+          onPrimary: '#0f172a',
+          primaryContainer: '#1e3a8a',   // Deep Blue Container
+          onPrimaryContainer: '#dbeafe',
+          
+          secondary: '#38bdf8',
+          onSecondary: '#0c4a6e',
+          secondaryContainer: '#1e293b', // Crisp Dark Slate
+          onSecondaryContainer: '#f1f5f9',
 
-          secondary: '#b4ccbe',
-          onSecondary: '#20352b',
-          secondaryContainer: '#364b41',
-          onSecondaryContainer: '#d0e8da',
+          tertiary: '#fbbf24',          // Gold Accent
+          onTertiary: '#451a03',
+          tertiaryContainer: '#78350f',
+          onTertiaryContainer: '#fef3c7',
 
-          tertiary: '#a6cbe2',
-          onTertiary: '#0a3446',
-          tertiaryContainer: '#264b5e',
-          onTertiaryContainer: '#c2e7ff',
+          error: '#f87171',
+          onError: '#450a0a',
+          errorContainer: '#7f1d1d',
+          onErrorContainer: '#fee2e2',
 
-          error: '#ffb4ab',
-          onError: '#690005',
-          errorContainer: '#93000a',
-          onErrorContainer: '#ffdad6',
+          outline: '#4b5563',
+          outlineVariant: '#374151',
+          onSurface: '#f3f4f6',
+          onSurfaceVariant: '#9ca3af',
 
-          pokerRaise: '#ff897d',
-          pokerRaiseContainer: '#8c1d18',
-          pokerCall: '#6cdbb6',
-          pokerCallContainer: '#00513c',
-          pokerFold: '#929c95',
-          pokerFoldContainer: '#2d3731'
+          pokerRaise: '#ef4444',
+          pokerRaiseContainer: '#7f1d1d',
+          pokerCall: '#10b981',
+          pokerCallContainer: '#064e3b',
+          pokerFold: '#3f3f46',
+          pokerFoldContainer: '#18181b',
         }
       },
       borderRadius: {
-        'm3-xs': '4px',
-        'm3-sm': '8px',
-        'm3-md': '12px',
-        'm3-lg': '16px',
-        'm3-xl': '28px',
-        'm3-full': '9999px'
-      },
-      fontFamily: {
-        sans: ['Roboto', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif']
+        'm3-xs': '2px',
+        'm3-sm': '4px',
+        'm3-md': '6px',
+        'm3-lg': '8px',
+        'm3-xl': '10px',
+        'm3-full': '9999px',
       }
     },
   },

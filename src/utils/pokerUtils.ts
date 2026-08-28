@@ -1,4 +1,4 @@
-import { ActionFrequencies, ActionType, Card, HandCategoryType, Position, Rank, Suit } from '../types/poker';
+import { ActionFrequencies, ActionType, Card, HandCategoryType, Position, Rank, RangeMorphologyStructure, Suit } from '../types/poker';
 
 export const RANKS: Rank[] = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 export const SUITS: Suit[] = ['s', 'h', 'd', 'c'];
@@ -152,6 +152,49 @@ export function evaluateUserAction(userAction: ActionType, freq: ActionFrequenci
   }
 
   return { isCorrect, isMixed, optimalAction, message };
+}
+
+export function getMorphologyStructureMeta(structure: RangeMorphologyStructure): {
+  label: string;
+  badgeBg: string;
+  textColor: string;
+  borderColor: string;
+  description: string;
+} {
+  switch (structure) {
+    case 'linear':
+      return {
+        label: 'Linear Range',
+        badgeBg: 'bg-emerald-950/80',
+        textColor: 'text-emerald-300',
+        borderColor: 'border-emerald-700/60',
+        description: 'Contains top-tier hands sequentially down to an equity threshold without gaps.'
+      };
+    case 'polarized':
+      return {
+        label: 'Polarized Range',
+        badgeBg: 'bg-red-950/80',
+        textColor: 'text-red-300',
+        borderColor: 'border-red-700/60',
+        description: 'Combines monster premium value hands + blocker-heavy bluffs, omitting medium hands.'
+      };
+    case 'condensed':
+      return {
+        label: 'Condensed Range',
+        badgeBg: 'bg-amber-950/80',
+        textColor: 'text-amber-300',
+        borderColor: 'border-amber-700/60',
+        description: 'Contains medium-strength hands & suited broadways calling to preserve pot odds without top premiums.'
+      };
+    case 'mixed':
+      return {
+        label: 'Mixed Range',
+        badgeBg: 'bg-purple-950/80',
+        textColor: 'text-purple-300',
+        borderColor: 'border-purple-700/60',
+        description: 'Fractionally splits actions (e.g. 50% Raise / 50% Call) to maintain GTO equilibrium.'
+      };
+  }
 }
 
 export function formatPositionLabel(pos: Position): string {

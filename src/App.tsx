@@ -133,7 +133,7 @@ export function App() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
+    <div className="min-h-screen bg-[#0d0e11] text-zinc-100 flex flex-col justify-between selection:bg-amber-500 selection:text-zinc-950">
       <div>
         <Navbar
           currentTab={currentTab}

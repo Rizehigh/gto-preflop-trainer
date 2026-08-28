@@ -7,10 +7,10 @@ export interface Card {
 }
 
 export type Position = 'UTG' | 'HJ' | 'CO' | 'BTN' | 'SB' | 'BB';
-
 export type SpotCategory = 'rfi' | 'facing_open' | 'facing_3bet';
-
 export type ActionType = 'fold' | 'call' | 'raise';
+
+export type RangeMorphologyStructure = 'linear' | 'polarized' | 'condensed' | 'mixed';
 
 export type HandCategoryType = 
   | 'pair' 
@@ -38,6 +38,8 @@ export interface SpotDefinition {
   facingAction: string;
   allowedActions: ActionType[];
   raiseLabel: string;
+  morphologyStructure: RangeMorphologyStructure;
+  morphologyDescription: string;
   ranges: Record<string, ActionFrequencies>;
 }
 

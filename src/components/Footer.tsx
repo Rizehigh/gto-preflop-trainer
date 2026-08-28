@@ -7,7 +7,7 @@ export const Footer: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="font-bold text-m3-onSurface">GTO Preflop & Morphology Trainer</span>
           <span>•</span>
-          <span>Material 3 Flat High Contrast Architecture</span>
+          <span>6-Max 100BB GTO Solver</span>
         </div>
 
         <div className="flex items-center gap-3 text-m3-onSurfaceVariant text-[11px] font-semibold">
@@ -15,6 +15,7 @@ export const Footer: React.FC = () => {
           <span className="bg-m3-surfaceContainerHigh px-2 py-0.5 rounded-m3-xs font-mono text-m3-primary border border-m3-outlineVariant">1: Fold</span>
           <span className="bg-m3-surfaceContainerHigh px-2 py-0.5 rounded-m3-xs font-mono text-m3-primary border border-m3-outlineVariant">2: Call</span>
           <span className="bg-m3-surfaceContainerHigh px-2 py-0.5 rounded-m3-xs font-mono text-m3-primary border border-m3-outlineVariant">3: Raise</span>
+          <span className="bg-m3-surfaceContainerHigh px-2 py-0.5 rounded-m3-xs font-mono text-m3-primary border border-m3-outlineVariant">H: Hint</span>
           <span className="bg-m3-surfaceContainerHigh px-2 py-0.5 rounded-m3-xs font-mono text-m3-primary border border-m3-outlineVariant">Space: Next</span>
         </div>
       </div>

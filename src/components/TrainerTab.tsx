@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ActionType, Card, HandAttempt, Position, SpotDefinition } from '../types/poker';
 import { SPOT_DEFINITIONS } from '../data/gtoRanges';
-import { classifyHandType, dealCardsForNotation, evaluateUserAction, formatPositionLabel, getAll169Hands } from '../utils/pokerUtils';
+import { classifyHandType, dealCardsForNotation, evaluateUserAction, formatPositionLabel, getAll169Hands, getMorphologyStructureMeta } from '../utils/pokerUtils';
 import { sounds } from '../utils/soundEffects';
 import { PokerTable } from './PokerTable';
 import { PlayingCard } from './PlayingCard';
 import { MorphologyExplanation } from './MorphologyExplanation';
 import { RangeGrid } from './RangeGrid';
-import { Filter, RefreshCw, ShieldAlert, Lock, Eye, HelpCircle, GraduationCap } from 'lucide-react';
+import { Filter, RefreshCw, ShieldAlert, Lock, Eye, GraduationCap, Lightbulb } from 'lucide-react';
 
 interface TrainerTabProps {
   onRecordAttempt: (attempt: HandAttempt) => void;
@@ -22,6 +22,8 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const [handNotation, setHandNotation] = useState<string>('AKs');
   const [dealtCards, setDealtCards] = useState<Card[]>([]);
   const [userAction, setUserAction] = useState<ActionType | null>(null);
+  const [showHint, setShowHint] = useState<boolean>(false);
+
   const [evaluation, setEvaluation] = useState<{
     isCorrect: boolean;
     isMixed: boolean;
@@ -53,6 +55,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
 
     setUserAction(null);
     setEvaluation(null);
+    setShowHint(false);
 
     sounds.playCardDeal();
   }, [selectedSpotId, selectedCategory, leakPosition]);
@@ -100,6 +103,10 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
 
+      if (e.key === 'h' || e.key === 'H') {
+        setShowHint((prev) => !prev);
+      }
+
       if (userAction === null) {
         if (e.key === '1') handleActionPick('fold');
         if (e.key === '2' && currentSpot.allowedActions.includes('call')) handleActionPick('call');
@@ -117,11 +124,12 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   }, [userAction, currentSpot, generateNewHand]);
 
   const freq = currentSpot.ranges[handNotation] || { fold: 1, call: 0, raise: 0 };
+  const morphologyMeta = getMorphologyStructureMeta(currentSpot.morphologyStructure);
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-5">
       
-      {/* Surface Controls Bar */}
+      {/* Controls Header */}
       <div className="bg-m3-surfaceContainerLow border border-m3-outline p-4 rounded-m3-md flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2 text-xs font-bold text-m3-onSurfaceVariant uppercase tracking-wider">
@@ -165,19 +173,34 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
           )}
         </div>
 
-        <button
-          onClick={generateNewHand}
-          className="px-4 py-1.5 bg-m3-surfaceContainerHigh hover:bg-m3-surfaceBright text-m3-onSurface font-bold rounded-m3-xs text-xs flex items-center gap-2 transition-colors border border-m3-outlineVariant shadow-sm"
-        >
-          <RefreshCw className="w-3.5 h-3.5 text-m3-primary" />
-          <span>New Hand</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowHint((prev) => !prev)}
+            className={`px-3 py-1.5 font-bold rounded-m3-xs text-xs flex items-center gap-1.5 transition-colors border shadow-sm ${
+              showHint
+                ? 'bg-amber-500 text-zinc-950 border-amber-400 font-extrabold'
+                : 'bg-m3-surfaceContainerHigh hover:bg-m3-surfaceBright text-m3-onSurface border-m3-outlineVariant'
+            }`}
+            title="Toggle GTO Solution Hint (Key H)"
+          >
+            <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
+            <span>{showHint ? 'Hide Hint (H)' : 'Peek Hint (H)'}</span>
+          </button>
+
+          <button
+            onClick={generateNewHand}
+            className="px-4 py-1.5 bg-m3-surfaceContainerHigh hover:bg-m3-surfaceBright text-m3-onSurface font-bold rounded-m3-xs text-xs flex items-center gap-2 transition-colors border border-m3-outlineVariant shadow-sm"
+          >
+            <RefreshCw className="w-3.5 h-3.5 text-m3-primary" />
+            <span>New Hand</span>
+          </button>
+        </div>
       </div>
 
-      {/* Main Grid Section */}
+      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         
-        {/* Left Column: Cards & Action Buttons */}
+        {/* Left Column: Poker Table & Action Controls */}
         <div className="lg:col-span-6 flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 shadow-sm relative">
           
           <PokerTable
@@ -258,8 +281,8 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
 
         {/* Right Column: Solution Grid & Morphology Feedback */}
         <div className="lg:col-span-6 space-y-4 flex flex-col items-center w-full">
-          {userAction === null ? (
-            /* Locked / Pre-Decision Learning Placeholder */
+          {userAction === null && !showHint ? (
+            /* Pre-Decision Locked State */
             <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 text-center space-y-4 shadow">
               <div className="w-12 h-12 bg-m3-surfaceContainerHigh border border-m3-outlineVariant rounded-m3-xs flex items-center justify-center mx-auto text-m3-primary shadow-sm">
                 <Lock className="w-6 h-6" />
@@ -268,31 +291,40 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               <div>
                 <h3 className="text-sm font-bold text-m3-onSurface">GTO Solution Matrix Locked</h3>
                 <p className="text-xs text-m3-onSurfaceVariant font-medium mt-1 max-w-sm mx-auto leading-relaxed">
-                  Make your move (Fold, Call, or Raise) to test your preflop intuition and unlock the complete GTO solution matrix & morphology explanation.
+                  Make your play or press <strong className="text-amber-400 font-mono">H</strong> for a GTO solution hint.
                 </p>
+              </div>
+
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setShowHint(true)}
+                  className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 rounded-m3-xs text-xs flex items-center gap-2 transition-colors"
+                >
+                  <Eye className="w-4 h-4 text-amber-400" />
+                  <span>Reveal GTO Hint (Key H)</span>
+                </button>
               </div>
 
               <div className="bg-m3-surfaceContainerHigh p-4 rounded-m3-xs border border-m3-outlineVariant text-left space-y-2.5">
                 <div className="text-xs font-bold text-m3-primary flex items-center gap-1.5 uppercase tracking-wider">
                   <GraduationCap className="w-4 h-4" />
-                  <span>How to Learn & Improve</span>
+                  <span>How to Learn Preflop GTO</span>
                 </div>
 
                 <ul className="text-xs text-m3-onSurfaceVariant space-y-1.5 font-medium list-disc list-inside">
-                  <li><strong className="text-m3-onSurface">Test Your Decision:</strong> Pick Fold, Call, or Raise for Hero's position.</li>
-                  <li><strong className="text-m3-onSurface">Understand Why:</strong> Read the post-decision morphology insights (Blockers, Suitedness, Equity Realization).</li>
-                  <li><strong className="text-m3-onSurface">Inspect the Matrix:</strong> Click any hand in the revealed 13x13 grid to see combo counts and exact GTO frequencies.</li>
-                  <li><strong className="text-m3-onSurface">Fix Your Leaks:</strong> Check the Analytics tab to practice your weakest seat positions.</li>
+                  <li><strong className="text-m3-onSurface">Test Decision:</strong> Choose Fold, Call, or Raise for Hero.</li>
+                  <li><strong className="text-m3-onSurface">Range Morphology:</strong> Classify ranges into Linear, Polarized, Condensed, or Mixed structures.</li>
+                  <li><strong className="text-m3-onSurface">Hint Shortcut:</strong> Press <kbd className="px-1 py-0.5 bg-zinc-800 text-amber-400 rounded font-mono text-[10px]">H</kbd> anytime to peek at the GTO solution matrix.</li>
                 </ul>
               </div>
             </div>
           ) : (
-            /* Post-Decision Solution & Feedback */
+            /* Unlocked Solution Grid & Morphology Breakdown */
             <>
               {evaluation && (
                 <MorphologyExplanation
                   isCorrect={evaluation.isCorrect}
-                  userAction={userAction}
+                  userAction={userAction!}
                   optimalAction={evaluation.optimalAction}
                   message={evaluation.message}
                   handNotation={handNotation}
@@ -304,11 +336,26 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                 />
               )}
 
-              <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow overflow-hidden">
+              <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow overflow-hidden space-y-3">
+                {/* Range Morphology Structure Header */}
+                <div className={`p-3 rounded-m3-xs border flex flex-col gap-1 ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs uppercase font-extrabold tracking-wider text-m3-onSurface">
+                      Spot Range Morphology
+                    </span>
+                    <span className={`px-2.5 py-0.5 font-black text-xs uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.borderColor}`}>
+                      {morphologyMeta.label}
+                    </span>
+                  </div>
+                  <p className="text-xs font-semibold text-zinc-300 leading-snug mt-0.5">
+                    {currentSpot.morphologyDescription}
+                  </p>
+                </div>
+
                 <RangeGrid
                   spot={currentSpot}
                   highlightHand={handNotation}
-                  title={`GTO Solution: ${currentSpot.name}`}
+                  title={`GTO Matrix: ${currentSpot.name}`}
                   showLegend
                 />
               </div>

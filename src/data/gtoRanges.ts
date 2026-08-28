@@ -284,6 +284,8 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     facingAction: 'Folded to you (Unopened)',
     allowedActions: ['fold', 'raise'],
     raiseLabel: 'Raise (Open 2.5x)',
+    morphologyStructure: 'linear',
+    morphologyDescription: 'Linear Range: Pure high-card strength & pocket pairs opening starting from top hands down to threshold without gaps.',
     ranges: utgRfiRanges
   },
   {
@@ -295,6 +297,8 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     facingAction: 'Folded to you (Unopened)',
     allowedActions: ['fold', 'raise'],
     raiseLabel: 'Raise (Open 2.5x)',
+    morphologyStructure: 'linear',
+    morphologyDescription: 'Linear Range: Expands top-tier hands linearly down to include high suited broadways and suited connectors.',
     ranges: hjRfiRanges
   },
   {
@@ -306,6 +310,8 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     facingAction: 'Folded to you (Unopened)',
     allowedActions: ['fold', 'raise'],
     raiseLabel: 'Raise (Open 2.5x)',
+    morphologyStructure: 'linear',
+    morphologyDescription: 'Linear Range: Wide merged opening range taking advantage of late position stealing opportunity.',
     ranges: coRfiRanges
   },
   {
@@ -317,6 +323,8 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     facingAction: 'Folded to you (Unopened)',
     allowedActions: ['fold', 'raise'],
     raiseLabel: 'Raise (Open 2.5x)',
+    morphologyStructure: 'linear',
+    morphologyDescription: 'Linear Range: Wide uncapped merged opening range attacking the blinds.',
     ranges: btnRfiRanges
   },
   {
@@ -328,6 +336,8 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     facingAction: 'Folded to you (Unopened)',
     allowedActions: ['fold', 'call', 'raise'],
     raiseLabel: 'Raise (Open 3x)',
+    morphologyStructure: 'mixed',
+    morphologyDescription: 'Mixed Range: High frequency blend of raises, limps/calls, and folds due to playing OOP postflop.',
     ranges: sbRfiRanges
   },
   {
@@ -340,6 +350,8 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     facingAction: 'UTG opens to 2.5x',
     allowedActions: ['fold', 'call', 'raise'],
     raiseLabel: '3-Bet (to 7.5x)',
+    morphologyStructure: 'polarized',
+    morphologyDescription: 'Polarized Range: 3-betting premium value (AA/KK/AK) & A-blocker bluffs while flat-calling medium suited broadways.',
     ranges: btnVsUtgRanges
   },
   {
@@ -352,6 +364,8 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     facingAction: 'BTN opens to 2.5x',
     allowedActions: ['fold', 'call', 'raise'],
     raiseLabel: '3-Bet (to 9x)',
+    morphologyStructure: 'condensed',
+    morphologyDescription: 'Condensed Range: Flatting medium-strength hands, suited connectors & broadways while capping top monsters.',
     ranges: bbVsBtnRanges
   },
   {
@@ -364,6 +378,8 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     facingAction: 'UTG opens to 2.5x',
     allowedActions: ['fold', 'call', 'raise'],
     raiseLabel: '3-Bet (to 10x)',
+    morphologyStructure: 'condensed',
+    morphologyDescription: 'Condensed Range: Tight defensive call range of medium pairs and suited aces vs tight UTG open.',
     ranges: bbVsUtgRanges
   },
   {
@@ -376,6 +392,8 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     facingAction: 'You opened 2.5x, BB 3-bets to 9x',
     allowedActions: ['fold', 'call', 'raise'],
     raiseLabel: '4-Bet (to 22x)',
+    morphologyStructure: 'polarized',
+    morphologyDescription: 'Polarized Range: 4-betting premium value & A5s bluffs, while calling in position with broadways.',
     ranges: btnVsBb3BetRanges
   },
   {
@@ -388,6 +406,8 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     facingAction: 'You opened 2.5x, BTN 3-bets to 7.5x',
     allowedActions: ['fold', 'call', 'raise'],
     raiseLabel: '4-Bet (to 19x)',
+    morphologyStructure: 'polarized',
+    morphologyDescription: 'Polarized Range: OOP 4-betting premium value & AK bluffs, folding intermediate unsuited hands.',
     ranges: utgVsBtn3BetRanges
   }
 ];

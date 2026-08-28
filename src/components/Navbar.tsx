@@ -35,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               GTO Preflop Trainer
             </h1>
             <span className="text-[11px] font-bold text-m3-primary tracking-wide uppercase">
-              Material 3 Gold & Emerald
+              6-Max 100BB Preflop Strategy
             </span>
           </div>
         </div>

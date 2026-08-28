@@ -2,7 +2,8 @@ import React from 'react';
 import { ActionFrequencies, ActionType, Card, HandCategoryType } from '../types/poker';
 import { getMorphologyInsightForHand } from '../data/morphologyData';
 import { getHandCombosCount } from '../utils/pokerUtils';
-import { CheckCircle2, XCircle, Lightbulb, Shield, Zap, Sparkles, Compass } from 'lucide-react';
+import { AmateurProfile, AmateurExploitResult } from '../data/amateurProfiles';
+import { CheckCircle2, XCircle, Lightbulb, Shield, Zap, Sparkles, Compass, Target, AlertTriangle } from 'lucide-react';
 
 interface MorphologyExplanationProps {
   isCorrect: boolean;
@@ -15,6 +16,8 @@ interface MorphologyExplanationProps {
   frequencies: ActionFrequencies;
   spotName: string;
   onNext: () => void;
+  amateurProfile?: AmateurProfile | null;
+  amateurExploit?: AmateurExploitResult | null;
 }
 
 export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
@@ -27,7 +30,9 @@ export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
   handType,
   frequencies,
   spotName,
-  onNext
+  onNext,
+  amateurProfile,
+  amateurExploit
 }) => {
   const insight = getMorphologyInsightForHand(handNotation);
   const combos = getHandCombosCount(handNotation);
@@ -53,8 +58,13 @@ export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
             <XCircle className="w-7 h-7 text-red-400 shrink-0" />
           )}
           <div>
-            <div className="text-[11px] uppercase tracking-wider font-extrabold text-white">
-              {isCorrect ? 'Correct Play' : 'GTO Inaccuracy'}
+            <div className="text-[11px] uppercase tracking-wider font-extrabold text-white flex items-center gap-1.5">
+              <span>{isCorrect ? 'Correct Play' : 'Suboptimal Play'}</span>
+              {amateurProfile && (
+                <span className={`px-1.5 py-0.5 rounded text-[10px] ${amateurProfile.badgeColor}`}>
+                  {amateurProfile.avatar} vs {amateurProfile.shortName}
+                </span>
+              )}
             </div>
             <div className="text-xs sm:text-sm font-semibold">{message}</div>
           </div>
@@ -69,10 +79,30 @@ export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
         </button>
       </div>
 
+      {/* Amateur Exploit Card (when in Amateur Mode) */}
+      {amateurProfile && amateurExploit && (
+        <div className={`p-4 rounded-m3-sm border space-y-2 text-xs ${amateurProfile.bgColor} ${amateurProfile.borderColor}`}>
+          <div className="flex items-center justify-between font-bold border-b pb-2 border-white/10">
+            <div className="flex items-center gap-2 text-white">
+              <Target className="w-4 h-4 text-amber-400" />
+              <span>Exploitative Strategy vs {amateurProfile.name}</span>
+            </div>
+            <span className={`px-2 py-0.5 rounded font-extrabold text-[10px] ${amateurProfile.badgeColor}`}>
+              Optimal Exploit: {amateurExploit.optimalExploitAction.toUpperCase()}
+            </span>
+          </div>
+
+          <div className="space-y-1.5 font-medium text-zinc-200">
+            <p><strong className="text-amber-300">Exploit Analysis:</strong> {amateurExploit.exploitReasoning}</p>
+            <p><strong className="text-emerald-300">EV Difference:</strong> {amateurExploit.evDifferenceNote}</p>
+          </div>
+        </div>
+      )}
+
       {/* Frequencies Bar */}
       <div className="bg-m3-surfaceContainerHigh p-3.5 rounded-m3-sm border border-m3-outlineVariant space-y-2">
         <div className="flex justify-between items-center text-xs font-bold text-m3-onSurfaceVariant">
-          <span>GTO Solution for {handNotation} ({combos} combos)</span>
+          <span>GTO Baseline Solution for {handNotation} ({combos} combos)</span>
           <span className="text-m3-primary">{spotName}</span>
         </div>
         <div className="h-4 w-full bg-m3-surfaceContainerHighest rounded-m3-xs overflow-hidden flex border border-m3-outlineVariant">

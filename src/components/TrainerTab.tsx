@@ -2,13 +2,15 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ActionType, Card, HandAttempt, Position, SpotDefinition, TableSize } from '../types/poker';
 import { SPOT_DEFINITIONS } from '../data/gtoRanges';
 import { classifyHandType, dealCardsForNotation, evaluateUserAction, formatPositionLabel, getAll169Hands, getMorphologyStructureMeta } from '../utils/pokerUtils';
+import { AMATEUR_PROFILES, AmateurArchetypeId, AmateurExploitResult, evaluateAmateurExploit, getAmateurVillainRange } from '../data/amateurProfiles';
 import { sounds } from '../utils/soundEffects';
 import { PokerTable } from './PokerTable';
 import { PlayingCard } from './PlayingCard';
 import { MorphologyExplanation } from './MorphologyExplanation';
 import { RangeGrid } from './RangeGrid';
 import { PositionalHandMatrixModal } from './PositionalHandMatrixModal';
-import { Filter, RefreshCw, ShieldAlert, Lock, Eye, GraduationCap, Lightbulb, Users, UserCheck, HelpCircle, Info, X } from 'lucide-react';
+import { GtoMathToolbar } from './GtoMathToolbar';
+import { Filter, RefreshCw, ShieldAlert, Lock, Eye, GraduationCap, Lightbulb, Users, UserCheck, HelpCircle, Info, X, Sparkles, Target, Zap } from 'lucide-react';
 
 interface TrainerTabProps {
   onRecordAttempt: (attempt: HandAttempt) => void;
@@ -30,12 +32,19 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const [isCallHovered, setIsCallHovered] = useState<boolean>(false);
   const [showRangeMatrix, setShowRangeMatrix] = useState<boolean>(false);
 
+  // Amateur Mode States
+  const [isAmateurMode, setIsAmateurMode] = useState<boolean>(false);
+  const [selectedArchetype, setSelectedArchetype] = useState<AmateurArchetypeId | 'random'>('random');
+  const [activeArchetypeId, setActiveArchetypeId] = useState<AmateurArchetypeId>('maniac');
+
   const [evaluation, setEvaluation] = useState<{
     isCorrect: boolean;
     isMixed: boolean;
     optimalAction: ActionType;
     message: string;
   } | null>(null);
+
+  const [amateurExploitResult, setAmateurExploitResult] = useState<AmateurExploitResult | null>(null);
 
   const generateNewHand = useCallback(() => {
     let availableSpots = SPOT_DEFINITIONS;
@@ -59,14 +68,24 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
     const cards = dealCardsForNotation(randomNotation);
     setDealtCards(cards);
 
+    // Set Amateur Archetype for this hand
+    if (selectedArchetype === 'random') {
+      const archetypes: AmateurArchetypeId[] = ['maniac', 'calling_station', 'nit', 'wild'];
+      const chosen = archetypes[Math.floor(Math.random() * archetypes.length)];
+      setActiveArchetypeId(chosen);
+    } else {
+      setActiveArchetypeId(selectedArchetype);
+    }
+
     setUserAction(null);
     setEvaluation(null);
+    setAmateurExploitResult(null);
     setShowHint(false);
     setShowCallDisabledInfo(false);
     setIsCallHovered(false);
 
     sounds.playCardDeal();
-  }, [selectedSpotId, selectedCategory, leakPosition]);
+  }, [selectedSpotId, selectedCategory, leakPosition, selectedArchetype]);
 
   useEffect(() => {
     generateNewHand();
@@ -76,7 +95,22 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
     if (userAction !== null) return;
 
     const freq = currentSpot.ranges[handNotation] || { fold: 1, call: 0, raise: 0 };
-    const evalResult = evaluateUserAction(action, freq);
+    
+    let evalResult;
+    let exploitRes: AmateurExploitResult | null = null;
+
+    if (isAmateurMode) {
+      exploitRes = evaluateAmateurExploit(action, handNotation, currentSpot, activeArchetypeId);
+      evalResult = {
+        isCorrect: exploitRes.isCorrect,
+        isMixed: false,
+        optimalAction: exploitRes.optimalExploitAction,
+        message: exploitRes.message
+      };
+      setAmateurExploitResult(exploitRes);
+    } else {
+      evalResult = evaluateUserAction(action, freq);
+    }
     
     setUserAction(action);
     setEvaluation(evalResult);
@@ -101,7 +135,9 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
       userAction: action,
       optimalAction: evalResult.optimalAction,
       isCorrect: evalResult.isCorrect,
-      frequencies: freq
+      frequencies: freq,
+      isAmateurMode,
+      amateurArchetype: isAmateurMode ? activeArchetypeId : undefined
     };
 
     onRecordAttempt(attempt);
@@ -139,18 +175,43 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
 
   const freq = currentSpot.ranges[handNotation] || { fold: 1, call: 0, raise: 0 };
   const morphologyMeta = getMorphologyStructureMeta(currentSpot.morphologyStructure);
+  const activeAmateurProfile = isAmateurMode ? AMATEUR_PROFILES[activeArchetypeId] : null;
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-5">
       
-      {/* Controls Header */}
+      {/* Mode & Controls Header */}
       <div className="bg-m3-surfaceContainerLow border border-m3-outline p-4 rounded-m3-md flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-m3-onSurfaceVariant uppercase tracking-wider">
-            <Filter className="w-4 h-4 text-m3-primary" />
-            <span>Spot Selector</span>
+          
+          {/* Mode Switcher */}
+          <div className="flex items-center gap-1 bg-m3-surfaceContainer p-1 rounded-m3-xs border border-m3-outlineVariant">
+            <button
+              onClick={() => setIsAmateurMode(false)}
+              className={`px-3 py-1 text-xs font-extrabold rounded-m3-xs transition-all flex items-center gap-1.5 ${
+                !isAmateurMode
+                  ? 'bg-m3-primary text-m3-onPrimary shadow-sm'
+                  : 'text-m3-onSurfaceVariant hover:text-m3-onSurface'
+              }`}
+            >
+              <GraduationCap className="w-3.5 h-3.5" />
+              <span>GTO Standard</span>
+            </button>
+
+            <button
+              onClick={() => setIsAmateurMode(true)}
+              className={`px-3 py-1 text-xs font-extrabold rounded-m3-xs transition-all flex items-center gap-1.5 ${
+                isAmateurMode
+                  ? 'bg-amber-500 text-zinc-950 shadow-sm'
+                  : 'text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceBright'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Amateur Exploitative Mode</span>
+            </button>
           </div>
 
+          {/* Spot Selectors */}
           <select
             value={selectedSpotId}
             onChange={(e) => {
@@ -179,6 +240,24 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             <option value="facing_3bet">Facing 3-Bet</option>
           </select>
 
+          {/* Amateur Archetype Selector (when in Amateur Mode) */}
+          {isAmateurMode && (
+            <div className="flex items-center gap-1.5 bg-amber-950/60 border border-amber-500/60 px-2.5 py-1 rounded-m3-xs">
+              <span className="text-[11px] font-bold text-amber-300">Opponent:</span>
+              <select
+                value={selectedArchetype}
+                onChange={(e) => setSelectedArchetype(e.target.value as any)}
+                className="bg-zinc-900 text-amber-200 border border-amber-600/50 rounded text-xs font-bold px-2 py-0.5 focus:outline-none"
+              >
+                <option value="random">🎲 Random Amateur</option>
+                <option value="maniac">💣 Maniac (Super Aggressive)</option>
+                <option value="calling_station">🦥 Calling Station (Passive)</option>
+                <option value="nit">🐢 Ultra Tight Nit</option>
+                <option value="wild">🎲 Wild / Unpredictable</option>
+              </select>
+            </div>
+          )}
+
           {leakPosition && (
             <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-950 border border-amber-500 rounded-m3-xs text-xs font-bold text-amber-300">
               <ShieldAlert className="w-3.5 h-3.5" />
@@ -195,7 +274,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                 ? 'bg-amber-500 text-zinc-950 border-amber-400 font-extrabold'
                 : 'bg-m3-surfaceContainerHigh hover:bg-m3-surfaceBright text-m3-onSurface border-m3-outlineVariant'
             }`}
-            title="Toggle GTO Solution Hint (Key H)"
+            title="Toggle Solution Hint (Key H)"
           >
             <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
             <span>{showHint ? 'Hide Hint (H)' : 'Peek Hint (H)'}</span>
@@ -211,6 +290,38 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
         </div>
       </div>
 
+      {/* Amateur Mode Banner (when active) */}
+      {isAmateurMode && activeAmateurProfile && (
+        <div className={`p-4 rounded-m3-md border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow ${activeAmateurProfile.bgColor} ${activeAmateurProfile.borderColor}`}>
+          <div className="flex items-center gap-3">
+            <div className="text-3xl p-2 bg-zinc-900/80 border border-zinc-700 rounded-m3-xs shadow-inner">
+              {activeAmateurProfile.avatar}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-black text-white">{activeAmateurProfile.name}</span>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${activeAmateurProfile.badgeColor}`}>
+                  {activeAmateurProfile.shortName}
+                </span>
+              </div>
+              <p className="text-xs text-zinc-200 font-medium mt-0.5">
+                {activeAmateurProfile.tagline}
+              </p>
+            </div>
+          </div>
+
+          <div className="text-xs space-y-1 md:text-right max-w-md bg-zinc-950/60 p-2.5 rounded-m3-xs border border-white/10">
+            <div className="font-bold text-amber-300 flex items-center gap-1 md:justify-end">
+              <Target className="w-3.5 h-3.5 text-amber-400" />
+              <span>Exploit Focus:</span>
+            </div>
+            <p className="text-zinc-200 font-medium text-[11px] leading-tight">
+              {activeAmateurProfile.exploitSummary}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Main Grid Container */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
@@ -225,6 +336,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             tableSize={tableSize}
             onTableSizeChange={setTableSize}
             onSelectSeat={() => setShowPositionalMatrix(true)}
+            amateurProfile={activeAmateurProfile}
           />
 
           <div className="my-2 flex items-center justify-center gap-4">
@@ -256,7 +368,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
           {/* Action Buttons */}
           <div className="w-full max-w-md space-y-3">
             <div className="text-xs font-bold text-m3-onSurfaceVariant text-center uppercase tracking-wider mb-2">
-              Select Optimal Play
+              {isAmateurMode ? 'Select Optimal Exploitative Play' : 'Select Optimal GTO Play'}
             </div>
 
             <div className="grid grid-cols-3 gap-3">
@@ -311,7 +423,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                       ? 'bg-emerald-600 border-white text-white ring-2 ring-white'
                       : 'bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-500'
                   }`}
-                  title={!currentSpot.allowedActions.includes('call') ? "Hover, click, or press '2' for GTO context on why calling is disabled" : ""}
+                  title={!currentSpot.allowedActions.includes('call') ? "Hover, click, or press '2' for context on why calling is disabled" : ""}
                 >
                   <div className="flex items-center gap-1">
                     <span>CALL</span>
@@ -366,34 +478,31 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                     <p className="text-zinc-300 text-[11px] leading-relaxed">
                       <strong className="text-white">GTO Standard:</strong> In unopened preflop pots from early & late positions ({formatPositionLabel(currentSpot.heroPosition)}), GTO mandates a strict <em>Raise-or-Fold</em> strategy. Open-calling (limping) forfeits pot initiative, gives away preflop equity, and invites players behind to squeeze or over-realize equity.
                     </p>
-                    <div className="border-t border-zinc-800 pt-1.5 mt-1 text-[11px] leading-relaxed text-zinc-300">
-                      <span className="font-bold text-emerald-400">When CAN calling be a valid choice?</span>
-                      <ul className="list-disc list-inside mt-1 space-y-1 text-zinc-300 text-[10.5px]">
-                        <li><strong className="text-zinc-100">Small Blind Open:</strong> SB uses a mixed limp/raise strategy against the BB due to discounted pot odds.</li>
-                        <li><strong className="text-zinc-100">Facing Opens / 3-Bets:</strong> Defending in position (e.g. BTN vs UTG open) or defending the Big Blind.</li>
-                        <li><strong className="text-zinc-100">Exploitative Play:</strong> In loose/passive games with weak players behind who rarely squeeze, multiway limping/flatting with speculative hands (small pocket pairs, suited connectors) can yield high implied odds.</li>
-                      </ul>
-                    </div>
                   </div>
                 </div>
               </div>
             )}
+
+            {/* GTO Equity & Math Intelligence Toolbar */}
+            <GtoMathToolbar spot={currentSpot} handNotation={handNotation} />
           </div>
         </div>
 
-        {/* Right Column: GTO Solution & Dual 13x13 Range Grid Matrices */}
-        <div className="lg:col-span-6 flex flex-col items-center w-full space-y-4">
+        {/* Right Column: Solution Grid & Feedback */}
+        <div className="lg:col-span-6 space-y-4 flex flex-col items-center w-full">
           {userAction === null && !showHint ? (
-            /* Pre-Decision State: Range Grids Hidden / Locked */
+            /* Pre-Decision Locked State */
             <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 text-center space-y-4 shadow">
-              <div className="w-12 h-12 bg-m3-surfaceContainerHigh border border-m3-outlineVariant rounded-m3-xs flex items-center justify-center mx-auto text-amber-400 shadow-sm">
+              <div className="w-12 h-12 bg-m3-surfaceContainerHigh border border-m3-outlineVariant rounded-m3-xs flex items-center justify-center mx-auto text-m3-primary shadow-sm">
                 <Lock className="w-6 h-6" />
               </div>
               
               <div>
-                <h3 className="text-base font-bold text-m3-onSurface">GTO Range Matrices Hidden</h3>
+                <h3 className="text-sm font-bold text-m3-onSurface">
+                  {isAmateurMode ? 'Amateur Exploit Matrix Locked' : 'GTO Solution Matrix Locked'}
+                </h3>
                 <p className="text-xs text-m3-onSurfaceVariant font-medium mt-1 max-w-sm mx-auto leading-relaxed">
-                  Make your play (Fold, Call, or Raise) to test your skills and unlock the full 13x13 GTO Hero & Villain range matrices!
+                  Make your decision or press <strong className="text-amber-400 font-mono">H</strong> for a hint.
                 </p>
               </div>
 
@@ -403,26 +512,27 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                   className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 rounded-m3-xs text-xs flex items-center gap-2 transition-colors"
                 >
                   <Eye className="w-4 h-4 text-amber-400" />
-                  <span>Reveal GTO Hint (Key H)</span>
+                  <span>Reveal Solution Hint (Key H)</span>
                 </button>
               </div>
 
-              <div className="bg-m3-surfaceContainerHigh p-4 rounded-m3-xs border border-m3-outlineVariant text-left space-y-2.5">
-                <div className="text-xs font-bold text-m3-primary flex items-center gap-1.5 uppercase tracking-wider">
-                  <GraduationCap className="w-4 h-4" />
-                  <span>How to Learn Preflop GTO</span>
+              {isAmateurMode && activeAmateurProfile && (
+                <div className="bg-amber-950/40 p-3.5 rounded-m3-xs border border-amber-500/40 text-left space-y-1.5">
+                  <div className="text-xs font-bold text-amber-300 flex items-center gap-1.5 uppercase">
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Targeting Opponent Tendency:</span>
+                  </div>
+                  <ul className="text-xs text-zinc-300 space-y-1 font-medium list-disc list-inside">
+                    <li><strong>RFI:</strong> {activeAmateurProfile.tendencies.rfiTendency}</li>
+                    <li><strong>Facing Open:</strong> {activeAmateurProfile.tendencies.facingOpenTendency}</li>
+                    <li><strong>Facing 3-Bet:</strong> {activeAmateurProfile.tendencies.facing3betTendency}</li>
+                  </ul>
                 </div>
-
-                <ul className="text-xs text-m3-onSurfaceVariant space-y-2 font-medium list-disc list-inside">
-                  <li><strong className="text-m3-onSurface">Test Decision:</strong> Select Fold, Call, or Raise for Hero using your mouse or keys 1/2/3.</li>
-                  <li><strong className="text-m3-onSurface">Hero & Villain Ranges:</strong> Compare Hero's defense/raise strategy directly against Villain's opening range.</li>
-                  <li><strong className="text-m3-onSurface">Hint Shortcut:</strong> Press <kbd className="px-1 py-0.5 bg-zinc-800 text-amber-400 rounded font-mono text-[10px]">H</kbd> anytime to reveal GTO ranges.</li>
-                </ul>
-              </div>
+              )}
             </div>
           ) : (
-            /* Post-Decision State: Revealed Hero & Villain 13x13 Range Grids & GTO Feedback */
-            <div className="w-full space-y-5 animate-fadeIn">
+            /* Unlocked Solution Grid & Feedback */
+            <>
               {evaluation && (
                 <MorphologyExplanation
                   isCorrect={evaluation.isCorrect}
@@ -435,80 +545,46 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                   frequencies={freq}
                   spotName={currentSpot.name}
                   onNext={generateNewHand}
+                  amateurProfile={activeAmateurProfile}
+                  amateurExploit={amateurExploitResult}
                 />
               )}
 
-              {/* HERO 13x13 GTO RANGE MATRIX */}
-              <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs uppercase font-extrabold tracking-wider text-amber-400 font-mono">
-                      HERO RANGE ({currentSpot.heroPosition}):
+              <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow overflow-hidden space-y-3">
+                <div className={`p-3 rounded-m3-xs border flex flex-col gap-1 ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs uppercase font-extrabold tracking-wider text-m3-onSurface">
+                      Spot Range Morphology
                     </span>
-                    <span className={`px-2 py-0.5 font-black text-[10px] uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
+                    <span className={`px-2.5 py-0.5 font-black text-xs uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.borderColor}`}>
                       {morphologyMeta.label}
                     </span>
                   </div>
+                  <p className="text-xs font-semibold text-zinc-300 leading-snug mt-0.5">
+                    {currentSpot.morphologyDescription}
+                  </p>
                 </div>
 
-                <p className="text-xs font-medium text-m3-onSurfaceVariant leading-snug">
-                  {currentSpot.morphologyDescription}
-                </p>
-
-                <div className="pt-2 border-t border-m3-outlineVariant">
-                  <RangeGrid
-                    spot={currentSpot}
-                    highlightHand={handNotation}
-                    overrideTarget="hero"
-                    title={`Hero GTO Matrix (${currentSpot.heroPosition})`}
-                    showLegend
-                  />
-                </div>
+                <RangeGrid
+                  spot={currentSpot}
+                  highlightHand={handNotation}
+                  title={`GTO Matrix: ${currentSpot.name}`}
+                  showLegend
+                />
               </div>
-
-              {/* VILLAIN 13x13 GTO RANGE MATRIX */}
-              <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs uppercase font-extrabold tracking-wider text-red-400 font-mono">
-                      VILLAIN RANGE ({currentSpot.villainPosition || 'OPENER'}):
-                    </span>
-                    {currentSpot.villainMorphologyStructure && (
-                      <span className="px-2 py-0.5 font-black text-[10px] uppercase tracking-wide border rounded-m3-xs bg-red-950/80 text-red-300 border-red-500">
-                        {currentSpot.villainMorphologyStructure}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <p className="text-xs font-medium text-m3-onSurfaceVariant leading-snug">
-                  {currentSpot.villainMorphologyDescription || `Preflop opening / raising range structure for ${currentSpot.villainPosition || 'Villain'}.`}
-                </p>
-
-                <div className="pt-2 border-t border-m3-outlineVariant">
-                  <RangeGrid
-                    spot={currentSpot}
-                    overrideTarget="villain"
-                    title={`Villain GTO Matrix (${currentSpot.villainPosition || 'Opener'})`}
-                    showLegend
-                  />
-                </div>
-              </div>
-            </div>
+            </>
           )}
         </div>
 
       </div>
+
+      {/* Modal for Positional Matrix */}
       {showPositionalMatrix && (
         <PositionalHandMatrixModal
           handNotation={handNotation}
-          tableSize={tableSize}
           currentHeroPosition={currentSpot.heroPosition}
+          tableSize={tableSize}
           onClose={() => setShowPositionalMatrix(false)}
-          onSelectPositionSpot={(spot) => {
-            setCurrentSpot(spot);
-            generateNewHand();
-          }}
         />
       )}
     </div>

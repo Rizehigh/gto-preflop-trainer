@@ -3,11 +3,41 @@ import { SPOT_DEFINITIONS } from '../data/gtoRanges';
 import { SpotDefinition } from '../types/poker';
 import { RangeGrid } from './RangeGrid';
 import { getAll169Hands, getHandCombosCount } from '../utils/pokerUtils';
-import { Grid, Filter } from 'lucide-react';
+import { AMATEUR_PROFILES, AmateurArchetypeId, getAmateurVillainRange } from '../data/amateurProfiles';
+import { Grid, Filter, Users, User, Zap } from 'lucide-react';
 
 export const StudyTab: React.FC = () => {
   const [selectedSpot, setSelectedSpot] = useState<SpotDefinition>(SPOT_DEFINITIONS[0]);
   const [filterAction, setFilterAction] = useState<'all' | 'raise' | 'call' | 'mixed'>('all');
+  const [viewMode, setViewMode] = useState<'hero' | 'villain_gto' | AmateurArchetypeId>('hero');
+
+  // Compute spot definition to pass to RangeGrid based on viewMode
+  const getActiveSpotDefinition = (): SpotDefinition => {
+    if (viewMode === 'hero') return selectedSpot;
+
+    if (viewMode === 'villain_gto') {
+      if (!selectedSpot.villainRange) return selectedSpot;
+      return {
+        ...selectedSpot,
+        name: `${selectedSpot.name} (Villain GTO Range)`,
+        ranges: selectedSpot.villainRange,
+        morphologyStructure: selectedSpot.villainMorphologyStructure || selectedSpot.morphologyStructure,
+        morphologyDescription: selectedSpot.villainMorphologyDescription || selectedSpot.morphologyDescription
+      };
+    }
+
+    // Amateur archetype
+    const amateurRange = getAmateurVillainRange(selectedSpot, viewMode);
+    const profile = AMATEUR_PROFILES[viewMode];
+    return {
+      ...selectedSpot,
+      name: `${selectedSpot.name} (${profile.avatar} ${profile.shortName} Range)`,
+      ranges: amateurRange,
+      morphologyDescription: `Distorted amateur range for ${profile.name}: ${profile.tagline}`
+    };
+  };
+
+  const activeSpot = getActiveSpotDefinition();
 
   const computeSpotStats = () => {
     let raiseCombos = 0;
@@ -17,7 +47,7 @@ export const StudyTab: React.FC = () => {
     const all169 = getAll169Hands();
     for (const hand of all169) {
       const combos = getHandCombosCount(hand);
-      const freq = selectedSpot.ranges[hand] || { fold: 1, call: 0, raise: 0 };
+      const freq = activeSpot.ranges[hand] || { fold: 1, call: 0, raise: 0 };
       raiseCombos += combos * (freq.raise || 0);
       callCombos += combos * (freq.call || 0);
       foldCombos += combos * (freq.fold || 0);
@@ -32,7 +62,6 @@ export const StudyTab: React.FC = () => {
   };
 
   const stats = computeSpotStats();
-
   const allPositions = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'] as const;
 
   return (
@@ -46,7 +75,7 @@ export const StudyTab: React.FC = () => {
               <Grid className="w-4 h-4" />
               <span>Range Explorer & Study Mode</span>
             </div>
-            <h2 className="text-xl font-bold text-m3-onSurface mt-1">{selectedSpot.name}</h2>
+            <h2 className="text-xl font-bold text-m3-onSurface mt-1">{activeSpot.name}</h2>
             <p className="text-xs text-m3-onSurfaceVariant font-medium mt-0.5">{selectedSpot.description}</p>
           </div>
 
@@ -69,29 +98,83 @@ export const StudyTab: React.FC = () => {
           </div>
         </div>
 
-        {/* Positional 13x13 Grid Selector Bar */}
+        {/* View Mode Switcher: Hero GTO vs Villain GTO vs Amateur Archetypes */}
         <div className="pt-2 border-t border-m3-outlineVariant flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-m3-onSurfaceVariant uppercase tracking-wider">Position Matrix:</span>
-          {allPositions.map((pos) => {
-            const isSelected = selectedSpot.heroPosition === pos && selectedSpot.category === 'rfi';
-            return (
-              <button
-                key={pos}
-                onClick={() => {
-                  const s = SPOT_DEFINITIONS.find(spot => spot.heroPosition === pos && spot.category === 'rfi')
-                    || SPOT_DEFINITIONS.find(spot => spot.heroPosition === pos);
-                  if (s) setSelectedSpot(s);
-                }}
-                className={`px-3 py-1 rounded-m3-xs text-xs font-bold transition-all border ${
-                  isSelected
-                    ? 'bg-amber-500 text-zinc-950 border-amber-400 font-extrabold shadow-sm'
-                    : 'bg-m3-surfaceContainerHigh text-m3-onSurface border-m3-outlineVariant hover:bg-m3-surfaceBright hover:border-zinc-700'
-                }`}
-              >
-                {pos} Grid
-              </button>
-            );
-          })}
+          <span className="text-xs font-bold text-m3-onSurfaceVariant uppercase tracking-wider flex items-center gap-1">
+            <Users className="w-3.5 h-3.5 text-amber-400" />
+            <span>Range View:</span>
+          </span>
+
+          <button
+            onClick={() => setViewMode('hero')}
+            className={`px-3 py-1 rounded-m3-xs text-xs font-bold transition-all border ${
+              viewMode === 'hero'
+                ? 'bg-m3-primary text-m3-onPrimary border-amber-400 shadow-sm'
+                : 'bg-m3-surfaceContainerHigh text-m3-onSurface border-m3-outlineVariant hover:bg-m3-surfaceBright'
+            }`}
+          >
+            Hero GTO Range
+          </button>
+
+          {selectedSpot.villainRange && (
+            <button
+              onClick={() => setViewMode('villain_gto')}
+              className={`px-3 py-1 rounded-m3-xs text-xs font-bold transition-all border ${
+                viewMode === 'villain_gto'
+                  ? 'bg-emerald-600 text-white border-emerald-400 shadow-sm'
+                  : 'bg-m3-surfaceContainerHigh text-m3-onSurface border-m3-outlineVariant hover:bg-m3-surfaceBright'
+              }`}
+            >
+              Villain GTO Range
+            </button>
+          )}
+
+          <div className="h-4 w-px bg-m3-outlineVariant mx-1 hidden sm:block" />
+
+          {/* Amateur Archetypes */}
+          <button
+            onClick={() => setViewMode('maniac')}
+            className={`px-2.5 py-1 rounded-m3-xs text-xs font-bold transition-all border ${
+              viewMode === 'maniac'
+                ? 'bg-red-600 text-white border-red-400 shadow-sm'
+                : 'bg-m3-surfaceContainerHigh text-red-300 border-red-900/60 hover:bg-red-950/40'
+            }`}
+          >
+            💣 Maniac
+          </button>
+
+          <button
+            onClick={() => setViewMode('calling_station')}
+            className={`px-2.5 py-1 rounded-m3-xs text-xs font-bold transition-all border ${
+              viewMode === 'calling_station'
+                ? 'bg-blue-600 text-white border-blue-400 shadow-sm'
+                : 'bg-m3-surfaceContainerHigh text-blue-300 border-blue-900/60 hover:bg-blue-950/40'
+            }`}
+          >
+            🦥 Calling Station
+          </button>
+
+          <button
+            onClick={() => setViewMode('nit')}
+            className={`px-2.5 py-1 rounded-m3-xs text-xs font-bold transition-all border ${
+              viewMode === 'nit'
+                ? 'bg-amber-600 text-white border-amber-400 shadow-sm'
+                : 'bg-m3-surfaceContainerHigh text-amber-300 border-amber-900/60 hover:bg-amber-950/40'
+            }`}
+          >
+            🐢 Nit
+          </button>
+
+          <button
+            onClick={() => setViewMode('wild')}
+            className={`px-2.5 py-1 rounded-m3-xs text-xs font-bold transition-all border ${
+              viewMode === 'wild'
+                ? 'bg-purple-600 text-white border-purple-400 shadow-sm'
+                : 'bg-m3-surfaceContainerHigh text-purple-300 border-purple-900/60 hover:bg-purple-950/40'
+            }`}
+          >
+            🎲 Wild
+          </button>
         </div>
 
         {/* Stats Summary Cards */}
@@ -172,8 +255,8 @@ export const StudyTab: React.FC = () => {
         </div>
 
         <RangeGrid
-          spot={selectedSpot}
-          title={`${selectedSpot.name} Full Range Matrix`}
+          spot={activeSpot}
+          title={`${activeSpot.name} Range Matrix`}
           filterAction={filterAction}
           showLegend
         />

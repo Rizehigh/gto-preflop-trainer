@@ -90,6 +90,8 @@ export interface HandAttempt {
   optimalAction: ActionType;
   isCorrect: boolean;
   frequencies: ActionFrequencies;
+  isAmateurMode?: boolean;
+  amateurArchetype?: string;
 }
 
 export interface UserStats {

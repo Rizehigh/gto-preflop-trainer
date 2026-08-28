@@ -34,8 +34,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <h1 className="text-base font-bold text-m3-onSurface tracking-tight leading-tight">
               GTO Preflop Trainer
             </h1>
-            <span className="text-[11px] font-bold text-m3-primary tracking-wide uppercase">
-              6-Max 100BB Preflop Strategy
+            <span className="text-[11px] font-extrabold text-amber-400 tracking-wide uppercase">
+              GTO Preflop & Range Morphology Engine (6–10 Max)
             </span>
           </div>
         </div>

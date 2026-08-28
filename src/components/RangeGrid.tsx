@@ -131,7 +131,7 @@ export const RangeGrid: React.FC<RangeGridProps> = ({
       </div>
 
       {/* 13x13 Grid Matrix Container */}
-      <div className="w-full max-w-md bg-zinc-950 p-2 sm:p-3 rounded-m3-md border border-m3-outlineVariant shadow-inner overflow-hidden">
+      <div className="w-full max-w-xl md:max-w-2xl lg:max-w-3xl bg-zinc-950 p-2 sm:p-4 rounded-m3-md border border-m3-outlineVariant shadow-inner overflow-hidden">
         <div className="grid grid-cols-13 gap-0.5 sm:gap-1">
           {RANKS.map((r1, rowIndex) =>
             RANKS.map((r2, colIndex) => {
@@ -146,7 +146,7 @@ export const RangeGrid: React.FC<RangeGridProps> = ({
                   key={notation}
                   onClick={() => setSelectedHand({ notation, freq })}
                   style={bgStyle}
-                  className={`aspect-square flex items-center justify-center rounded-m3-xs text-[9px] sm:text-[11px] font-bold text-white transition-all transform hover:scale-110 hover:z-30 hover:shadow-lg focus:outline-none relative overflow-hidden ${
+                  className={`aspect-square flex items-center justify-center rounded-m3-xs text-[9px] sm:text-xs md:text-sm font-bold text-white transition-all transform hover:scale-110 hover:z-30 hover:shadow-lg focus:outline-none relative overflow-hidden ${
                     !matchesFilter ? 'opacity-20' : 'opacity-100'
                   } ${
                     isCurrent

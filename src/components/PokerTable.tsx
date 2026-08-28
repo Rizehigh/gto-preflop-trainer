@@ -27,7 +27,7 @@ export const PokerTable: React.FC<PokerTableProps> = ({
     <div className="w-full flex flex-col items-center space-y-2">
       
       {/* Table Size Toggle Header */}
-      <div className="flex items-center justify-between w-full max-w-lg px-1">
+      <div className="flex items-center justify-between w-full max-w-xl md:max-w-2xl lg:max-w-3xl px-1">
         <div className="text-[11px] font-bold text-m3-onSurfaceVariant uppercase tracking-wider flex items-center gap-1.5">
           <span>Table Format:</span>
           <span className="text-amber-400 font-extrabold">{tableSize}-Max</span>
@@ -53,7 +53,7 @@ export const PokerTable: React.FC<PokerTableProps> = ({
       </div>
 
       {/* Dynamic Elliptical Felt Container */}
-      <div className="relative w-full max-w-lg h-60 bg-m3-surfaceContainerLow rounded-m3-lg border-2 border-m3-outlineVariant shadow flex items-center justify-center p-4 overflow-hidden my-1">
+      <div className="relative w-full max-w-xl md:max-w-2xl lg:max-w-3xl h-64 sm:h-72 md:h-80 lg:h-96 bg-m3-surfaceContainerLow rounded-m3-lg border-2 border-m3-outlineVariant shadow flex items-center justify-center p-4 overflow-hidden my-1">
         
         {/* Table Felt Ring */}
         <div className="absolute inset-4 border border-zinc-800 rounded-[80px] bg-zinc-950/40 pointer-events-none" />

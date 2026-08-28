@@ -128,7 +128,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const morphologyMeta = getMorphologyStructureMeta(currentSpot.morphologyStructure);
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-5">
+    <div className="w-full max-w-7xl mx-auto space-y-5">
       
       {/* Controls Header */}
       <div className="bg-m3-surfaceContainerLow border border-m3-outline p-4 rounded-m3-md flex flex-wrap items-center justify-between gap-4 shadow-sm">

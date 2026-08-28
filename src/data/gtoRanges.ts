@@ -274,6 +274,30 @@ const utgVsBtn3BetRanges = buildRange({
   }
 });
 
+// ----------------------------------------------------
+// MULTIWAY / SQUEEZE RANGES
+// ----------------------------------------------------
+const bbVsCoBtnSqueezeRanges = buildRange({
+  raiseHands: ['AA', 'KK', 'QQ', 'JJ', 'TT', 'AKs', 'AQs', 'AJs', 'AKo', 'A5s', 'A4s', '98s', '87s'],
+  callHands: ['99', '88', '77', '66', '55', 'KQs', 'KJs', 'QJs', 'JTs', 'T9s', 'AQo', 'AJo', 'KTs', 'QTs'],
+  mixRaise: { '99': 0.4, 'A5s': 0.7, 'A4s': 0.6, '98s': 0.5, '87s': 0.5, 'ATs': 0.4 },
+  mixCall: { '44': 0.5, '33': 0.5, '22': 0.4, '76s': 0.5, '65s': 0.4 }
+});
+
+const sbVsHjCoSqueezeRanges = buildRange({
+  raiseHands: ['AA', 'KK', 'QQ', 'JJ', 'TT', 'AKs', 'AQs', 'AKo', 'A5s', 'A4s'],
+  callHands: ['99', '88', 'KQs', 'QJs', 'JTs', 'AJs', 'ATs'],
+  mixRaise: { '99': 0.5, 'A3s': 0.4, 'KJs': 0.5, 'QJs': 0.3 },
+  mixCall: { '77': 0.5, 'KTs': 0.4, 'QTs': 0.4, 'T9s': 0.5 }
+});
+
+const btnVsUtgHjMultiwayRanges = buildRange({
+  raiseHands: ['AA', 'KK', 'QQ', 'AKs', 'AKo'],
+  callHands: ['JJ', 'TT', '99', '88', '77', 'KQs', 'KJs', 'QJs', 'JTs', 'T9s', 'AQs', 'AJs'],
+  mixRaise: { 'JJ': 0.4, 'A5s': 0.6, 'A4s': 0.5 },
+  mixCall: { '66': 0.6, '98s': 0.5, '87s': 0.4, 'ATs': 0.5, 'AQo': 0.5 }
+});
+
 export const SPOT_DEFINITIONS: SpotDefinition[] = [
   {
     id: 'utg_rfi',
@@ -424,9 +448,87 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     villainRange: btnVsUtgRanges,
     villainMorphologyStructure: 'polarized',
     villainMorphologyDescription: 'BTN 3-Betting Range vs UTG: ~7.5% tight polarized range.'
+  },
+  {
+    id: 'bb_vs_co_btn_squeeze',
+    name: 'BB Squeeze vs CO Open & BTN Call',
+    description: 'Multiway Pot: CO opens 2.5x and BTN flat calls 2.5x. You are in Big Blind facing two players. Squeeze 3-bet to 11x for value & bluffs.',
+    category: 'multiway_squeeze',
+    heroPosition: 'BB',
+    villainPosition: 'CO',
+    facingAction: 'CO opens 2.5x, BTN calls 2.5x',
+    allowedActions: ['fold', 'call', 'raise'],
+    raiseLabel: 'Squeeze 3-Bet (to 11x)',
+    morphologyStructure: 'polarized',
+    morphologyDescription: 'Multiway Squeeze Range: Squeezing to 11x with premium value (JJ+, AK) & A-blockers/suited connectors while flatting medium pairs.',
+    ranges: bbVsCoBtnSqueezeRanges,
+    villainRange: btnVsUtgRanges,
+    villainMorphologyStructure: 'condensed',
+    villainMorphologyDescription: 'BTN Cold Call Range: Medium suited broadways & pocket pairs capped against CO raise.'
+  },
+  {
+    id: 'sb_vs_hj_co_squeeze',
+    name: 'SB Squeeze vs HJ Open & CO Call',
+    description: 'Multiway Pot: HJ opens 2.5x and CO flat calls. Out of position in Small Blind, squeeze to 12x with strong linear/polarized value.',
+    category: 'multiway_squeeze',
+    heroPosition: 'SB',
+    villainPosition: 'HJ',
+    facingAction: 'HJ opens 2.5x, CO calls 2.5x',
+    allowedActions: ['fold', 'call', 'raise'],
+    raiseLabel: 'Squeeze 3-Bet (to 12x)',
+    morphologyStructure: 'polarized',
+    morphologyDescription: 'OOP Multiway Squeeze: Squeezing large to punish callers out of position.',
+    ranges: sbVsHjCoSqueezeRanges,
+    villainRange: hjRfiRanges,
+    villainMorphologyStructure: 'linear',
+    villainMorphologyDescription: 'HJ Opener Range: ~19% linear range.'
+  },
+  {
+    id: 'btn_vs_utg_hj_multiway',
+    name: 'BTN Defense vs UTG Open & HJ Call',
+    description: 'Multiway Pot: UTG opens 2.5x, HJ flat calls 2.5x. You have position on BTN. 3-bet top premiums or flat call high equity broadways.',
+    category: 'multiway_squeeze',
+    heroPosition: 'BTN',
+    villainPosition: 'UTG',
+    facingAction: 'UTG opens 2.5x, HJ calls 2.5x',
+    allowedActions: ['fold', 'call', 'raise'],
+    raiseLabel: 'Squeeze 3-Bet (to 9.5x)',
+    morphologyStructure: 'condensed',
+    morphologyDescription: 'In-Position Multiway Defense: Calling medium pairs & suited connectors in position to realize postflop equity.',
+    ranges: btnVsUtgHjMultiwayRanges,
+    villainRange: utgRfiRanges,
+    villainMorphologyStructure: 'linear',
+    villainMorphologyDescription: 'UTG Opener Range: ~15.2% tight linear range.'
   }
 ];
 
 export function getSpotById(id: string): SpotDefinition {
   return SPOT_DEFINITIONS.find(s => s.id === id) || SPOT_DEFINITIONS[0];
+}
+
+/**
+ * Returns GTO RFI matrix for ANY position from UTG down to BB.
+ */
+export function getPositionRfiRange(position: string): Record<string, ActionFrequencies> {
+  switch (position) {
+    case 'UTG':
+    case 'UTG+1':
+    case 'UTG+2':
+      return utgRfiRanges;
+    case 'MP':
+    case 'MP1':
+    case 'MP2':
+    case 'MP3':
+    case 'HJ':
+      return hjRfiRanges;
+    case 'CO':
+      return coRfiRanges;
+    case 'BTN':
+      return btnRfiRanges;
+    case 'SB':
+      return sbRfiRanges;
+    case 'BB':
+    default:
+      return buildRange({}); // BB fold range (everyone folded to BB, win pot)
+  }
 }

@@ -7,7 +7,7 @@ export const Footer: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="font-bold text-m3-onSurface">GTO Preflop & Morphology Trainer</span>
           <span>•</span>
-          <span>6-Max 100BB GTO Solver</span>
+          <span>6–10 Max 100BB GTO Solver & Range Morphology Engine</span>
         </div>
 
         <div className="flex items-center gap-3 text-m3-onSurfaceVariant text-[11px] font-semibold">

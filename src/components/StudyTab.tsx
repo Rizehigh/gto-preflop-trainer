@@ -33,6 +33,8 @@ export const StudyTab: React.FC = () => {
 
   const stats = computeSpotStats();
 
+  const allPositions = ['UTG', 'HJ', 'CO', 'BTN', 'SB', 'BB'] as const;
+
   return (
     <div className="w-full max-w-6xl mx-auto space-y-5">
       
@@ -65,6 +67,31 @@ export const StudyTab: React.FC = () => {
               ))}
             </select>
           </div>
+        </div>
+
+        {/* Positional 13x13 Grid Selector Bar */}
+        <div className="pt-2 border-t border-m3-outlineVariant flex flex-wrap items-center gap-2">
+          <span className="text-xs font-bold text-m3-onSurfaceVariant uppercase tracking-wider">Position Matrix:</span>
+          {allPositions.map((pos) => {
+            const isSelected = selectedSpot.heroPosition === pos && selectedSpot.category === 'rfi';
+            return (
+              <button
+                key={pos}
+                onClick={() => {
+                  const s = SPOT_DEFINITIONS.find(spot => spot.heroPosition === pos && spot.category === 'rfi')
+                    || SPOT_DEFINITIONS.find(spot => spot.heroPosition === pos);
+                  if (s) setSelectedSpot(s);
+                }}
+                className={`px-3 py-1 rounded-m3-xs text-xs font-bold transition-all border ${
+                  isSelected
+                    ? 'bg-amber-500 text-zinc-950 border-amber-400 font-extrabold shadow-sm'
+                    : 'bg-m3-surfaceContainerHigh text-m3-onSurface border-m3-outlineVariant hover:bg-m3-surfaceBright hover:border-zinc-700'
+                }`}
+              >
+                {pos} Grid
+              </button>
+            );
+          })}
         </div>
 
         {/* Stats Summary Cards */}

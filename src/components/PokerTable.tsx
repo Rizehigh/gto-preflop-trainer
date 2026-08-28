@@ -9,6 +9,7 @@ interface PokerTableProps {
   facingAction: string;
   tableSize?: TableSize;
   onTableSizeChange?: (size: TableSize) => void;
+  onSelectSeat?: (position: Position) => void;
 }
 
 export const PokerTable: React.FC<PokerTableProps> = ({
@@ -17,7 +18,8 @@ export const PokerTable: React.FC<PokerTableProps> = ({
   spotName,
   facingAction,
   tableSize = 6,
-  onTableSizeChange
+  onTableSizeChange,
+  onSelectSeat
 }) => {
   const positions = getPositionsForTableSize(tableSize);
   const seatCoords = calculateEllipseSeatCoordinates(tableSize);
@@ -91,13 +93,15 @@ export const PokerTable: React.FC<PokerTableProps> = ({
                 isHero ? 'scale-105 z-30' : isVillain ? 'scale-100 z-25' : 'opacity-70'
               }`}
             >
-              <div
-                className={`px-2.5 py-1 text-[11px] font-bold shadow flex items-center gap-1 border rounded-m3-xs ${
+              <button
+                onClick={() => onSelectSeat && onSelectSeat(pos)}
+                title={`Click seat to inspect ${pos} strategy matrix`}
+                className={`px-2.5 py-1 text-[11px] font-bold shadow flex items-center gap-1 border rounded-m3-xs transition-all hover:scale-110 focus:outline-none ${
                   isHero
                     ? 'bg-m3-primaryContainer text-m3-onPrimaryContainer border-amber-400 ring-2 ring-amber-400/50'
                     : isVillain
                     ? 'bg-red-950 text-red-200 border-red-500'
-                    : 'bg-m3-surfaceContainerHighest text-m3-onSurfaceVariant border-m3-outlineVariant'
+                    : 'bg-m3-surfaceContainerHighest text-m3-onSurfaceVariant border-m3-outlineVariant hover:border-amber-400 hover:text-white'
                 }`}
               >
                 <span>{pos}</span>
@@ -111,7 +115,7 @@ export const PokerTable: React.FC<PokerTableProps> = ({
                     Villain
                   </span>
                 )}
-              </div>
+              </button>
 
               {pos === 'BTN' && (
                 <div className="mt-0.5 w-3.5 h-3.5 bg-amber-400 text-black text-[9px] font-black rounded-m3-xs flex items-center justify-center shadow">

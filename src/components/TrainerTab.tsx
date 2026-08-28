@@ -7,7 +7,8 @@ import { PokerTable } from './PokerTable';
 import { PlayingCard } from './PlayingCard';
 import { MorphologyExplanation } from './MorphologyExplanation';
 import { RangeGrid } from './RangeGrid';
-import { Filter, RefreshCw, ShieldAlert, Lock, Eye, GraduationCap, Lightbulb } from 'lucide-react';
+import { PositionalHandMatrixModal } from './PositionalHandMatrixModal';
+import { Filter, RefreshCw, ShieldAlert, Lock, Eye, GraduationCap, Lightbulb, Users, UserCheck } from 'lucide-react';
 
 interface TrainerTabProps {
   onRecordAttempt: (attempt: HandAttempt) => void;
@@ -24,6 +25,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const [userAction, setUserAction] = useState<ActionType | null>(null);
   const [showHint, setShowHint] = useState<boolean>(false);
   const [tableSize, setTableSize] = useState<TableSize>(6);
+  const [showPositionalMatrix, setShowPositionalMatrix] = useState<boolean>(false);
 
   const [evaluation, setEvaluation] = useState<{
     isCorrect: boolean;
@@ -211,6 +213,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             facingAction={currentSpot.facingAction}
             tableSize={tableSize}
             onTableSizeChange={setTableSize}
+            onSelectSeat={() => setShowPositionalMatrix(true)}
           />
 
           <div className="my-5 flex items-center justify-center gap-4">
@@ -219,13 +222,24 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             ))}
           </div>
 
-          <div className="mb-5 flex flex-col items-center gap-1">
-            <span className="text-xl font-black tracking-tight text-m3-onSurface bg-m3-surfaceContainerHigh px-4 py-1 rounded-m3-xs border border-m3-outline">
-              {handNotation}
-            </span>
-            <span className="text-xs text-m3-onSurfaceVariant font-bold">
-              Hero: {formatPositionLabel(currentSpot.heroPosition)}
-            </span>
+          <div className="mb-5 flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-black tracking-tight text-m3-onSurface bg-m3-surfaceContainerHigh px-4 py-1 rounded-m3-xs border border-m3-outline">
+                {handNotation}
+              </span>
+              <span className="text-xs text-m3-onSurfaceVariant font-bold">
+                Hero: {formatPositionLabel(currentSpot.heroPosition)}
+              </span>
+            </div>
+
+            <button
+              onClick={() => setShowPositionalMatrix(true)}
+              className="px-3 py-1 bg-amber-950/80 hover:bg-amber-900 border border-amber-500/80 text-amber-300 rounded-m3-xs text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+              title="See what this hand would do from every position around the table"
+            >
+              <UserCheck className="w-3.5 h-3.5 text-amber-400" />
+              <span>Inspect {handNotation} Across All Positions</span>
+            </button>
           </div>
 
           {/* Action Buttons */}
@@ -367,6 +381,18 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
         </div>
 
       </div>
+      {showPositionalMatrix && (
+        <PositionalHandMatrixModal
+          handNotation={handNotation}
+          tableSize={tableSize}
+          currentHeroPosition={currentSpot.heroPosition}
+          onClose={() => setShowPositionalMatrix(false)}
+          onSelectPositionSpot={(spot) => {
+            setCurrentSpot(spot);
+            generateNewHand();
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -24,7 +24,8 @@ const INITIAL_STATS: UserStats = {
   byCategory: {
     rfi: { total: 0, correct: 0 },
     facing_open: { total: 0, correct: 0 },
-    facing_3bet: { total: 0, correct: 0 }
+    facing_3bet: { total: 0, correct: 0 },
+    multiway_squeeze: { total: 0, correct: 0 }
   },
   byHandType: {
     pair: { total: 0, correct: 0 },

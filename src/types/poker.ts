@@ -22,7 +22,7 @@ export type Position =
   | 'SB'
   | 'BB';
 
-export type SpotCategory = 'rfi' | 'facing_open' | 'facing_3bet';
+export type SpotCategory = 'rfi' | 'facing_open' | 'facing_3bet' | 'multiway_squeeze';
 export type ActionType = 'fold' | 'call' | 'raise';
 
 export type RangeMorphologyStructure = 'linear' | 'polarized' | 'condensed' | 'mixed';

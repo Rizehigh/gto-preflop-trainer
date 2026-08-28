@@ -211,35 +211,11 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
         </div>
       </div>
 
-      {/* Main Widescreen 3-Column Solver Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+      {/* Main Grid Container */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* LEFT COLUMN (4 Cols): Hero's 13x13 Range Matrix */}
-        <div className="lg:col-span-4 flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-3.5 shadow-sm space-y-2">
-          <div className="w-full flex items-center justify-between px-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-extrabold text-amber-400 uppercase tracking-wider font-mono">
-                HERO RANGE ({currentSpot.heroPosition})
-              </span>
-              <span className={`px-2 py-0.5 text-[10px] font-black uppercase rounded-m3-xs border ${morphologyMeta.textColor} ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
-                {morphologyMeta.label}
-              </span>
-            </div>
-            <span className="text-[10px] text-zinc-400 font-mono font-bold">13x13 Matrix</span>
-          </div>
-
-          <RangeGrid
-            spot={currentSpot}
-            highlightHand={handNotation}
-            overrideTarget="hero"
-            showLegend={false}
-            title=""
-            compact={true}
-          />
-        </div>
-
-        {/* CENTER COLUMN (4 Cols): Poker Table & Action Controls */}
-        <div className="lg:col-span-4 flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow-sm relative space-y-3">
+        {/* Main Column: Poker Table & Action Controls */}
+        <div className="lg:col-span-6 flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 shadow-sm relative space-y-4">
           
           <PokerTable
             heroPosition={currentSpot.heroPosition}
@@ -249,32 +225,31 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             tableSize={tableSize}
             onTableSizeChange={setTableSize}
             onSelectSeat={() => setShowPositionalMatrix(true)}
-            compact={true}
           />
 
-          <div className="flex items-center justify-center gap-3">
+          <div className="my-2 flex items-center justify-center gap-4">
             {dealtCards.map((card, idx) => (
-              <PlayingCard key={idx} card={card} size="md" animated />
+              <PlayingCard key={idx} card={card} size="lg" animated />
             ))}
           </div>
 
-          <div className="flex flex-col items-center gap-1.5">
+          <div className="flex flex-col items-center gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-black tracking-tight text-m3-onSurface bg-m3-surfaceContainerHigh px-3 py-0.5 rounded-m3-xs border border-m3-outline">
+              <span className="text-2xl font-black tracking-tight text-m3-onSurface bg-m3-surfaceContainerHigh px-4 py-1.5 rounded-m3-xs border border-m3-outline">
                 {handNotation}
               </span>
-              <span className="text-xs text-m3-onSurfaceVariant font-bold">
+              <span className="text-sm text-m3-onSurfaceVariant font-bold">
                 Hero: {formatPositionLabel(currentSpot.heroPosition)}
               </span>
             </div>
 
             <button
               onClick={() => setShowPositionalMatrix(true)}
-              className="px-2.5 py-0.5 bg-amber-950/80 hover:bg-amber-900 border border-amber-500/80 text-amber-300 rounded-m3-xs text-[11px] font-bold flex items-center gap-1 transition-colors shadow-sm"
+              className="px-3.5 py-1.5 bg-amber-950/80 hover:bg-amber-900 border border-amber-500/80 text-amber-300 rounded-m3-xs text-xs font-bold flex items-center gap-2 transition-colors shadow-sm"
               title="See what this hand would do from every position around the table"
             >
-              <UserCheck className="w-3 h-3 text-amber-400" />
-              <span>Inspect All Seats</span>
+              <UserCheck className="w-4 h-4 text-amber-400" />
+              <span>Inspect {handNotation} Across All Positions</span>
             </button>
           </div>
 
@@ -406,36 +381,48 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
           </div>
         </div>
 
-        {/* RIGHT COLUMN (4 Cols): Villain Range Matrix / GTO Solution */}
-        <div className="lg:col-span-4 flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-3.5 shadow-sm space-y-2">
+        {/* Right Column: GTO Solution & 13x13 Range Grid Matrix */}
+        <div className="lg:col-span-6 flex flex-col items-center w-full space-y-4">
           {userAction === null && !showHint ? (
-            /* Pre-Decision State: Display Villain's 13x13 Range Matrix */
-            <>
-              <div className="w-full flex items-center justify-between px-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-extrabold text-red-400 uppercase tracking-wider font-mono">
-                    VILLAIN RANGE ({currentSpot.villainPosition || 'OPENER'})
-                  </span>
-                  {currentSpot.villainMorphologyStructure && (
-                    <span className="px-2 py-0.5 text-[10px] font-black uppercase rounded-m3-xs border bg-red-950/80 text-red-300 border-red-500">
-                      {currentSpot.villainMorphologyStructure}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[10px] text-zinc-400 font-mono font-bold">13x13 Matrix</span>
+            /* Pre-Decision State: Range Grid Hidden / Locked */
+            <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 text-center space-y-4 shadow">
+              <div className="w-12 h-12 bg-m3-surfaceContainerHigh border border-m3-outlineVariant rounded-m3-xs flex items-center justify-center mx-auto text-amber-400 shadow-sm">
+                <Lock className="w-6 h-6" />
+              </div>
+              
+              <div>
+                <h3 className="text-base font-bold text-m3-onSurface">GTO Range Matrix Hidden</h3>
+                <p className="text-xs text-m3-onSurfaceVariant font-medium mt-1 max-w-sm mx-auto leading-relaxed">
+                  Make your play (Fold, Call, or Raise) to test your skills and unlock the full 13x13 GTO range solution matrix!
+                </p>
               </div>
 
-              <RangeGrid
-                spot={currentSpot}
-                overrideTarget="villain"
-                showLegend={false}
-                title=""
-                compact={true}
-              />
-            </>
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setShowHint(true)}
+                  className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 rounded-m3-xs text-xs flex items-center gap-2 transition-colors"
+                >
+                  <Eye className="w-4 h-4 text-amber-400" />
+                  <span>Reveal GTO Hint (Key H)</span>
+                </button>
+              </div>
+
+              <div className="bg-m3-surfaceContainerHigh p-4 rounded-m3-xs border border-m3-outlineVariant text-left space-y-2.5">
+                <div className="text-xs font-bold text-m3-primary flex items-center gap-1.5 uppercase tracking-wider">
+                  <GraduationCap className="w-4 h-4" />
+                  <span>How to Learn Preflop GTO</span>
+                </div>
+
+                <ul className="text-xs text-m3-onSurfaceVariant space-y-2 font-medium list-disc list-inside">
+                  <li><strong className="text-m3-onSurface">Test Decision:</strong> Select Fold, Call, or Raise for Hero using your mouse or keys 1/2/3.</li>
+                  <li><strong className="text-m3-onSurface">Range Morphology:</strong> Master whether this spot demands a Linear, Polarized, or Mixed strategy.</li>
+                  <li><strong className="text-m3-onSurface">Hint Shortcut:</strong> Press <kbd className="px-1 py-0.5 bg-zinc-800 text-amber-400 rounded font-mono text-[10px]">H</kbd> anytime to reveal the GTO hint.</li>
+                </ul>
+              </div>
+            </div>
           ) : (
-            /* Post-Decision State: GTO Solution & Morphology Feedback */
-            <div className="w-full space-y-3 animate-fadeIn">
+            /* Post-Decision State: Revealed 13x13 Range Grid & GTO Solution Feedback */
+            <div className="w-full space-y-4 animate-fadeIn">
               {evaluation && (
                 <MorphologyExplanation
                   isCorrect={evaluation.isCorrect}
@@ -450,6 +437,33 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                   onNext={generateNewHand}
                 />
               )}
+
+              {/* Full Original 13x13 GTO Range Matrix */}
+              <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs uppercase font-extrabold tracking-wider text-m3-onSurface">
+                      GTO Matrix Morphology:
+                    </span>
+                    <span className={`px-2 py-0.5 font-black text-[11px] uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
+                      {morphologyMeta.label}
+                    </span>
+                  </div>
+                </div>
+
+                <p className="text-xs font-medium text-m3-onSurfaceVariant leading-snug">
+                  {currentSpot.morphologyDescription}
+                </p>
+
+                <div className="pt-2 border-t border-m3-outlineVariant">
+                  <RangeGrid
+                    spot={currentSpot}
+                    highlightHand={handNotation}
+                    title={`GTO Range Matrix: ${currentSpot.name}`}
+                    showLegend
+                  />
+                </div>
+              </div>
             </div>
           )}
         </div>

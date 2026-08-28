@@ -88,6 +88,7 @@ export interface HandAttempt {
 }
 
 export interface UserStats {
+  lastVisited?: number;
   totalAttempts: number;
   correctAttempts: number;
   streak: number;

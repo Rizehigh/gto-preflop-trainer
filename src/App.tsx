@@ -46,21 +46,31 @@ export function App() {
       const saved = localStorage.getItem('gto_preflop_stats');
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsed: UserStats = JSON.parse(saved);
+          const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+          
+          // Check for 1-year (365 days) inactivity expiration
+          if (parsed.lastVisited && Date.now() - parsed.lastVisited > ONE_YEAR_MS) {
+            console.log('Stats expired after 1 year of inactivity. Resetting to initial stats.');
+            return { ...INITIAL_STATS, lastVisited: Date.now() };
+          }
+          
+          return { ...parsed, lastVisited: Date.now() };
         } catch (e) {
           console.error('Failed to parse saved stats', e);
         }
       }
     }
-    return INITIAL_STATS;
+    return { ...INITIAL_STATS, lastVisited: Date.now() };
   });
 
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [leakPosition, setLeakPosition] = useState<Position | null>(null);
 
-  // Persist stats to localStorage
+  // Persist stats to localStorage with updated lastVisited timestamp
   useEffect(() => {
-    localStorage.setItem('gto_preflop_stats', JSON.stringify(stats));
+    const updatedStats = { ...stats, lastVisited: Date.now() };
+    localStorage.setItem('gto_preflop_stats', JSON.stringify(updatedStats));
   }, [stats]);
 
   const handleRecordAttempt = (attempt: HandAttempt) => {

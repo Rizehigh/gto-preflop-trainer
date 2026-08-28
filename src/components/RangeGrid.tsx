@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ActionFrequencies, SpotDefinition } from '../types/poker';
-import { RANKS, getMatrixHandNotation } from '../utils/pokerUtils';
+import { RANKS, getMatrixHandNotation, getMorphologyStructureMeta } from '../utils/pokerUtils';
 import { HandDetailModal } from './HandDetailModal';
+import { User, ShieldAlert } from 'lucide-react';
 
 interface RangeGridProps {
   spot: SpotDefinition;
@@ -20,7 +21,18 @@ export const RangeGrid: React.FC<RangeGridProps> = ({
   filterAction = 'all',
   compact = false
 }) => {
+  const [viewTarget, setViewTarget] = useState<'hero' | 'villain'>('hero');
   const [selectedHand, setSelectedHand] = useState<{ notation: string; freq: ActionFrequencies } | null>(null);
+
+  const activeRanges = (viewTarget === 'villain' && spot.villainRange) ? spot.villainRange : spot.ranges;
+  const activeStructure = (viewTarget === 'villain' && spot.villainMorphologyStructure) 
+    ? spot.villainMorphologyStructure 
+    : spot.morphologyStructure;
+  const activeDescription = (viewTarget === 'villain' && spot.villainMorphologyDescription)
+    ? spot.villainMorphologyDescription
+    : spot.morphologyDescription;
+
+  const structureMeta = getMorphologyStructureMeta(activeStructure);
 
   const getCellBgStyle = (freq?: ActionFrequencies) => {
     if (!freq) return { backgroundColor: '#18181b' };
@@ -58,65 +70,95 @@ export const RangeGrid: React.FC<RangeGridProps> = ({
   };
 
   const isHandVisibleInFilter = (freq?: ActionFrequencies) => {
-    if (filterAction === 'all' || !freq) return true;
-    if (filterAction === 'raise') return (freq.raise || 0) > 0.15;
-    if (filterAction === 'call') return (freq.call || 0) > 0.15;
-    if (filterAction === 'mixed') {
-      const opt = Math.max(freq.raise || 0, freq.call || 0, freq.fold || 0);
-      return opt < 0.85 && opt > 0.15;
-    }
+    if (!freq || filterAction === 'all') return true;
+    const r = freq.raise || 0;
+    const c = freq.call || 0;
+    const f = freq.fold || 0;
+
+    if (filterAction === 'raise') return r > 0.1;
+    if (filterAction === 'call') return c > 0.1;
+    if (filterAction === 'mixed') return (r > 0.05 && r < 0.95) || (c > 0.05 && c < 0.95);
     return true;
   };
 
   return (
-    <div className="w-full flex flex-col items-center select-none overflow-hidden">
-      {title && (
-        <h4 className="text-xs font-bold text-m3-onSurfaceVariant mb-2 tracking-wide text-center uppercase flex items-center gap-2">
-          <span>{title}</span>
-          <span className="text-[10px] bg-m3-surfaceContainerHigh text-m3-onSurface px-2 py-0.5 border border-m3-outlineVariant font-mono">13x13</span>
-        </h4>
-      )}
+    <div className="w-full flex flex-col items-center space-y-3">
+      
+      {/* Header and Hero vs Villain View Toggle */}
+      <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+        <div>
+          {title && <h3 className="text-sm font-bold text-m3-onSurface">{title}</h3>}
+          
+          {/* Morphology Badge */}
+          <div className="flex items-center gap-2 mt-1">
+            <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-m3-xs border uppercase tracking-wider ${structureMeta.badgeBg} ${structureMeta.textColor} ${structureMeta.borderColor}`}>
+              {structureMeta.label}
+            </span>
+            <span className="text-[11px] text-zinc-400 font-medium">
+              {activeDescription}
+            </span>
+          </div>
+        </div>
 
-      {/* 13x13 Grid Container */}
-      <div className="w-full flex justify-center p-1">
-        <div className={`grid grid-cols-13 gap-0.5 p-1.5 bg-m3-surfaceContainerLow rounded-m3-sm border border-m3-outlineVariant shadow max-w-full min-w-[300px] ${
-          compact ? 'max-w-md' : 'max-w-xl'
-        }`}>
-          {RANKS.map((rowRank, rIdx) =>
-            RANKS.map((colRank, cIdx) => {
-              const notation = getMatrixHandNotation(rIdx, cIdx);
-              const freq = spot.ranges[notation] || { fold: 1, call: 0, raise: 0 };
-              const isHighlighted = highlightHand === notation;
+        {/* Hero vs Opponent Range Selector Toggle */}
+        {spot.villainRange && (
+          <div className="flex items-center gap-1 bg-m3-surfaceContainerHigh p-1 rounded-m3-xs border border-m3-outlineVariant shrink-0">
+            <button
+              onClick={() => setViewTarget('hero')}
+              className={`px-2.5 py-1 text-xs font-bold rounded-m3-xs flex items-center gap-1.5 transition-colors ${
+                viewTarget === 'hero'
+                  ? 'bg-amber-500 text-zinc-950 font-extrabold shadow-sm'
+                  : 'text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceBright'
+              }`}
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>Hero ({spot.heroPosition})</span>
+            </button>
+
+            <button
+              onClick={() => setViewTarget('villain')}
+              className={`px-2.5 py-1 text-xs font-bold rounded-m3-xs flex items-center gap-1.5 transition-colors ${
+                viewTarget === 'villain'
+                  ? 'bg-red-600 text-white font-extrabold shadow-sm'
+                  : 'text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceBright'
+              }`}
+            >
+              <ShieldAlert className="w-3.5 h-3.5" />
+              <span>Opponent ({spot.villainPosition})</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 13x13 Grid Matrix Container */}
+      <div className="w-full max-w-md bg-zinc-950 p-2 sm:p-3 rounded-m3-md border border-m3-outlineVariant shadow-inner overflow-hidden">
+        <div className="grid grid-cols-13 gap-0.5 sm:gap-1">
+          {RANKS.map((r1, rowIndex) =>
+            RANKS.map((r2, colIndex) => {
+              const notation = getMatrixHandNotation(rowIndex, colIndex);
+              const freq = activeRanges[notation];
+              const isCurrent = highlightHand === notation;
               const matchesFilter = isHandVisibleInFilter(freq);
-
-              const style = getCellBgStyle(freq);
-              const isPair = rIdx === cIdx;
+              const bgStyle = getCellBgStyle(freq);
 
               return (
                 <button
                   key={notation}
                   onClick={() => setSelectedHand({ notation, freq })}
-                  style={style}
-                  className={`relative aspect-square flex flex-col items-center justify-center font-bold text-white transition-all rounded-m3-xs ${
-                    compact ? 'text-[9px] p-0.5' : 'text-xs p-1'
+                  style={bgStyle}
+                  className={`aspect-square flex items-center justify-center rounded-m3-xs text-[9px] sm:text-[11px] font-bold text-white transition-all transform hover:scale-110 hover:z-30 hover:shadow-lg focus:outline-none relative overflow-hidden ${
+                    !matchesFilter ? 'opacity-20' : 'opacity-100'
                   } ${
-                    !matchesFilter ? 'opacity-20 grayscale' : 'hover:scale-105 hover:z-20 hover:ring-2 hover:ring-m3-primary shadow-sm'
-                  } ${
-                    isHighlighted
-                      ? 'ring-2 ring-amber-400 z-30 scale-105 shadow-md font-extrabold'
+                    isCurrent
+                      ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-black scale-105 z-20 font-black'
                       : ''
                   }`}
-                  title={`${notation} (${spot.name}): Raise ${Math.round((freq.raise||0)*100)}%, Call ${Math.round((freq.call||0)*100)}%, Fold ${Math.round((freq.fold||0)*100)}%`}
+                  title={`${notation}: Raise ${Math.round((freq?.raise || 0) * 100)}%, Call ${Math.round((freq?.call || 0) * 100)}%, Fold ${Math.round((freq?.fold || 0) * 100)}%`}
                 >
-                  <span className={`leading-none ${isPair ? 'text-amber-300 font-extrabold' : 'text-white'}`}>
-                    {notation}
-                  </span>
+                  <span className="drop-shadow-sm font-mono tracking-tighter">{notation}</span>
 
-                  {isHighlighted && (
-                    <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full bg-amber-400 opacity-75 rounded-full"></span>
-                      <span className="relative inline-flex h-2 w-2 bg-amber-500 rounded-full border border-black"></span>
-                    </span>
+                  {isCurrent && (
+                    <span className="absolute inset-0 border border-amber-400 animate-pulse rounded-m3-xs pointer-events-none" />
                   )}
                 </button>
               );
@@ -125,28 +167,29 @@ export const RangeGrid: React.FC<RangeGridProps> = ({
         </div>
       </div>
 
-      {/* Legend Footer */}
+      {/* Legend */}
       {showLegend && (
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-xs font-bold text-m3-onSurfaceVariant">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-m3-surfaceContainerHigh border border-m3-outlineVariant rounded-m3-xs">
-            <span className="w-2.5 h-2.5 bg-red-600 border border-red-400" />
-            <span className="text-red-300">Raise / 3-Bet</span>
+        <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-m3-onSurfaceVariant pt-1">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3.5 h-3.5 bg-red-600 rounded-m3-xs border border-red-400 shadow-sm" />
+            <span>Raise ({spot.raiseLabel})</span>
           </div>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-m3-surfaceContainerHigh border border-m3-outlineVariant rounded-m3-xs">
-            <span className="w-2.5 h-2.5 bg-emerald-600 border border-emerald-400" />
-            <span className="text-emerald-300">Call / Defend</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3.5 h-3.5 bg-emerald-600 rounded-m3-xs border border-emerald-400 shadow-sm" />
+            <span>Call / Defend</span>
           </div>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-m3-surfaceContainerHigh border border-m3-outlineVariant rounded-m3-xs">
-            <span className="w-2.5 h-2.5 bg-zinc-700 border border-zinc-500" />
-            <span className="text-zinc-300">Fold</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3.5 h-3.5 bg-[#1f242e] rounded-m3-xs border border-zinc-700 shadow-sm" />
+            <span>Fold</span>
           </div>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-m3-surfaceContainerHigh border border-m3-outlineVariant rounded-m3-xs">
-            <span className="w-2.5 h-2.5 bg-gradient-to-r from-red-600 via-emerald-600 to-zinc-700 border border-zinc-500" />
-            <span className="text-amber-300">Mixed Strategy</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3.5 h-3.5 bg-gradient-to-r from-red-600 to-emerald-600 rounded-m3-xs shadow-sm" />
+            <span>Mixed Strategy</span>
           </div>
         </div>
       )}
 
+      {/* Hand Detail Modal on Cell Click */}
       {selectedHand && (
         <HandDetailModal
           notation={selectedHand.notation}

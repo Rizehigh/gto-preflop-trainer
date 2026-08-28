@@ -57,6 +57,11 @@ export interface SpotDefinition {
   morphologyStructure: RangeMorphologyStructure;
   morphologyDescription: string;
   ranges: Record<string, ActionFrequencies>;
+  
+  // Villain / Opponent Range Data
+  villainRange?: Record<string, ActionFrequencies>;
+  villainMorphologyStructure?: RangeMorphologyStructure;
+  villainMorphologyDescription?: string;
 }
 
 export interface MorphologyInsight {
@@ -103,7 +108,7 @@ export interface PositionMathMetrics {
   position: Position;
   seatsToBtn: number;
   playersBehind: number;
-  probabilityPremiumBehind: number; // e.g. 0.32
-  gtoRfiFrequency: number; // e.g. 11.5
+  probabilityPremiumBehind: number;
+  gtoRfiFrequency: number;
   rangeStructure: RangeMorphologyStructure;
 }

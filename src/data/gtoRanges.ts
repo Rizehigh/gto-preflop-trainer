@@ -352,7 +352,10 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     raiseLabel: '3-Bet (to 7.5x)',
     morphologyStructure: 'polarized',
     morphologyDescription: 'Polarized Range: 3-betting premium value (AA/KK/AK) & A-blocker bluffs while flat-calling medium suited broadways.',
-    ranges: btnVsUtgRanges
+    ranges: btnVsUtgRanges,
+    villainRange: utgRfiRanges,
+    villainMorphologyStructure: 'linear',
+    villainMorphologyDescription: 'UTG Opener Range: ~15.2% tight linear range (77+, A7s+, K9s+, Q9s+, J9s+, T9s, A10o+, KQo).'
   },
   {
     id: 'bb_vs_btn',
@@ -366,7 +369,10 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     raiseLabel: '3-Bet (to 9x)',
     morphologyStructure: 'condensed',
     morphologyDescription: 'Condensed Range: Flatting medium-strength hands, suited connectors & broadways while capping top monsters.',
-    ranges: bbVsBtnRanges
+    ranges: bbVsBtnRanges,
+    villainRange: btnRfiRanges,
+    villainMorphologyStructure: 'linear',
+    villainMorphologyDescription: 'BTN Opener Range: ~45.5% wide merged linear range attacking the blinds.'
   },
   {
     id: 'bb_vs_utg',
@@ -380,7 +386,10 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     raiseLabel: '3-Bet (to 10x)',
     morphologyStructure: 'condensed',
     morphologyDescription: 'Condensed Range: Tight defensive call range of medium pairs and suited aces vs tight UTG open.',
-    ranges: bbVsUtgRanges
+    ranges: bbVsUtgRanges,
+    villainRange: utgRfiRanges,
+    villainMorphologyStructure: 'linear',
+    villainMorphologyDescription: 'UTG Opener Range: ~15.2% tight linear range.'
   },
   {
     id: 'btn_vs_bb_3bet',
@@ -394,7 +403,10 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     raiseLabel: '4-Bet (to 22x)',
     morphologyStructure: 'polarized',
     morphologyDescription: 'Polarized Range: 4-betting premium value & A5s bluffs, while calling in position with broadways.',
-    ranges: btnVsBb3BetRanges
+    ranges: btnVsBb3BetRanges,
+    villainRange: bbVsBtnRanges,
+    villainMorphologyStructure: 'polarized',
+    villainMorphologyDescription: 'BB 3-Betting Range: ~13.5% polarized range (3-betting premium value & suited wheel bluffs).'
   },
   {
     id: 'utg_vs_btn_3bet',
@@ -408,7 +420,10 @@ export const SPOT_DEFINITIONS: SpotDefinition[] = [
     raiseLabel: '4-Bet (to 19x)',
     morphologyStructure: 'polarized',
     morphologyDescription: 'Polarized Range: OOP 4-betting premium value & AK bluffs, folding intermediate unsuited hands.',
-    ranges: utgVsBtn3BetRanges
+    ranges: utgVsBtn3BetRanges,
+    villainRange: btnVsUtgRanges,
+    villainMorphologyStructure: 'polarized',
+    villainMorphologyDescription: 'BTN 3-Betting Range vs UTG: ~7.5% tight polarized range.'
   }
 ];
 

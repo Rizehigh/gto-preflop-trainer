@@ -1,6 +1,7 @@
 import React from 'react';
 import { BookOpen, Layers, Zap, Compass } from 'lucide-react';
 import { GtoMathSection } from './GtoMathSection';
+import { RangeQuizSection } from './RangeQuizSection';
 
 export const GuideTab: React.FC = () => {
   return (
@@ -17,6 +18,9 @@ export const GuideTab: React.FC = () => {
           Learn foundational principles of preflop range construction, positioning, and hand characteristics.
         </p>
       </div>
+
+      {/* Range Morphology Predictor Quiz */}
+      <RangeQuizSection />
 
       {/* GTO Mathematics for 6 to 10 Max Tables */}
       <GtoMathSection />

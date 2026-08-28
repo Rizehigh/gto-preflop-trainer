@@ -56,11 +56,11 @@ export const GtoMathToolbar: React.FC<GtoMathToolbarProps> = ({ spot, handNotati
     <div className="w-full max-w-xl md:max-w-2xl lg:max-w-3xl bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-xs p-3.5 space-y-3 shadow-sm text-xs mt-3 animate-fadeIn">
       {/* Header Badge */}
       <div className="flex items-center justify-between border-b border-m3-outlineVariant/80 pb-2">
-        <div className="flex items-center gap-1.5 font-black text-amber-400 uppercase tracking-wider text-[11px] font-mono">
-          <Zap className="w-4 h-4 text-amber-400 shrink-0" />
+        <div className="flex items-center gap-1.5 font-black text-amber-400 uppercase tracking-wider text-sm font-mono">
+          <Zap className="w-4.5 h-4.5 text-amber-400 shrink-0" />
           <span>GTO Math & Equity Intelligence</span>
         </div>
-        <div className="flex items-center gap-1 text-[11px] font-mono">
+        <div className="flex items-center gap-1 text-sm font-mono">
           <span className="text-m3-onSurfaceVariant font-bold">EqR:</span>
           <span className="text-emerald-400 font-extrabold">{eqRealization}</span>
         </div>
@@ -71,44 +71,44 @@ export const GtoMathToolbar: React.FC<GtoMathToolbarProps> = ({ spot, handNotati
         
         {/* Metric 1: Pot Odds */}
         <div className="bg-m3-surfaceContainerHigh border border-m3-outlineVariant/80 rounded-m3-xs p-3 space-y-1 shadow-xs">
-          <div className="text-[11px] font-bold text-m3-onSurfaceVariant flex items-center gap-1.5">
-            <Percent className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          <div className="text-sm font-bold text-m3-onSurfaceVariant flex items-center gap-1.5">
+            <Percent className="w-4 h-4 text-amber-400 shrink-0" />
             <span>Pot Odds Required</span>
           </div>
-          <div className="text-xs font-bold text-m3-onSurface font-mono leading-relaxed">
+          <div className="text-sm font-bold text-m3-onSurface font-mono leading-relaxed">
             {potOddsPct}
           </div>
         </div>
 
         {/* Metric 2: MDF */}
         <div className="bg-m3-surfaceContainerHigh border border-m3-outlineVariant/80 rounded-m3-xs p-3 space-y-1 shadow-xs">
-          <div className="text-[11px] font-bold text-m3-onSurfaceVariant flex items-center gap-1.5">
-            <Shield className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+          <div className="text-sm font-bold text-m3-onSurfaceVariant flex items-center gap-1.5">
+            <Shield className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>Minimum Defense Frequency (MDF)</span>
           </div>
-          <div className="text-xs font-bold text-emerald-400 font-mono leading-relaxed">
+          <div className="text-sm font-bold text-emerald-400 font-mono leading-relaxed">
             {mdfPct}
           </div>
         </div>
 
         {/* Metric 3: Blockers */}
         <div className="bg-m3-surfaceContainerHigh border border-m3-outlineVariant/80 rounded-m3-xs p-3 space-y-1 shadow-xs">
-          <div className="text-[11px] font-bold text-m3-onSurfaceVariant flex items-center gap-1.5">
-            <Target className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+          <div className="text-sm font-bold text-m3-onSurfaceVariant flex items-center gap-1.5">
+            <Target className="w-4 h-4 text-purple-400 shrink-0" />
             <span>Blocker Removal Power</span>
           </div>
-          <div className="text-xs font-bold text-purple-300 font-mono leading-relaxed">
+          <div className="text-sm font-bold text-purple-300 font-mono leading-relaxed">
             {blockerText}
           </div>
         </div>
 
         {/* Metric 4: Premium Risk */}
         <div className="bg-m3-surfaceContainerHigh border border-m3-outlineVariant/80 rounded-m3-xs p-3 space-y-1 shadow-xs">
-          <div className="text-[11px] font-bold text-m3-onSurfaceVariant flex items-center gap-1.5">
-            <PieChart className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          <div className="text-sm font-bold text-m3-onSurfaceVariant flex items-center gap-1.5">
+            <PieChart className="w-4 h-4 text-amber-400 shrink-0" />
             <span>Premium Hand Risk Behind</span>
           </div>
-          <div className="text-xs font-bold text-amber-300 font-mono leading-relaxed">
+          <div className="text-sm font-bold text-amber-300 font-mono leading-relaxed">
             {(math.probabilityPremiumBehind * 100).toFixed(1)}% premium chance ({math.playersBehind} players left behind)
           </div>
         </div>

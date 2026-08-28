@@ -58,36 +58,36 @@ export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
             <XCircle className="w-7 h-7 text-red-400 shrink-0" />
           )}
           <div>
-            <div className="text-[11px] uppercase tracking-wider font-extrabold text-white flex items-center gap-1.5">
+            <div className="text-sm uppercase tracking-wider font-extrabold text-white flex items-center gap-1.5">
               <span>{isCorrect ? 'Correct Play' : 'Suboptimal Play'}</span>
               {amateurProfile && (
-                <span className={`px-1.5 py-0.5 rounded text-[10px] ${amateurProfile.badgeColor}`}>
+                <span className={`px-1.5 py-0.5 rounded text-sm ${amateurProfile.badgeColor}`}>
                   {amateurProfile.avatar} vs {amateurProfile.shortName}
                 </span>
               )}
             </div>
-            <div className="text-xs sm:text-sm font-semibold">{message}</div>
+            <div className="text-sm sm:text-sm font-semibold">{message}</div>
           </div>
         </div>
 
         <button
           onClick={onNext}
-          className="px-4 py-2 bg-m3-primary hover:bg-amber-300 text-m3-onPrimary font-extrabold rounded-m3-xs shadow transition-all shrink-0 text-xs flex items-center gap-1.5 active:scale-95"
+          className="px-4 py-2 bg-m3-primary hover:bg-amber-300 text-m3-onPrimary font-extrabold rounded-m3-xs shadow transition-all shrink-0 text-sm flex items-center gap-1.5 active:scale-95"
         >
           <span>Next Hand</span>
-          <span className="text-[10px] opacity-80 hidden sm:inline">(Space)</span>
+          <span className="text-sm opacity-80 hidden sm:inline">(Space)</span>
         </button>
       </div>
 
       {/* Amateur Exploit Card (when in Amateur Mode) */}
       {amateurProfile && amateurExploit && (
-        <div className={`p-4 rounded-m3-sm border space-y-2 text-xs ${amateurProfile.bgColor} ${amateurProfile.borderColor}`}>
+        <div className={`p-4 rounded-m3-sm border space-y-2 text-sm ${amateurProfile.bgColor} ${amateurProfile.borderColor}`}>
           <div className="flex items-center justify-between font-bold border-b pb-2 border-white/10">
             <div className="flex items-center gap-2 text-white">
               <Target className="w-4 h-4 text-amber-400" />
               <span>Exploitative Strategy vs {amateurProfile.name}</span>
             </div>
-            <span className={`px-2 py-0.5 rounded font-extrabold text-[10px] ${amateurProfile.badgeColor}`}>
+            <span className={`px-2 py-0.5 rounded font-extrabold text-sm ${amateurProfile.badgeColor}`}>
               Optimal Exploit: {amateurExploit.optimalExploitAction.toUpperCase()}
             </span>
           </div>
@@ -101,20 +101,20 @@ export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
 
       {/* Frequencies Bar */}
       <div className="bg-m3-surfaceContainerHigh p-3.5 rounded-m3-sm border border-m3-outlineVariant space-y-2">
-        <div className="flex justify-between items-center text-xs font-bold text-m3-onSurfaceVariant">
+        <div className="flex justify-between items-center text-sm font-bold text-m3-onSurfaceVariant">
           <span>GTO Baseline Solution for {handNotation} ({combos} combos)</span>
           <span className="text-m3-primary">{spotName}</span>
         </div>
         <div className="h-4 w-full bg-m3-surfaceContainerHighest rounded-m3-xs overflow-hidden flex border border-m3-outlineVariant">
-          {raisePct > 0 && <div style={{ width: `${raisePct}%` }} className="bg-red-600 text-[10px] font-bold text-white flex items-center justify-center">{raisePct}%</div>}
-          {callPct > 0 && <div style={{ width: `${callPct}%` }} className="bg-emerald-600 text-[10px] font-bold text-white flex items-center justify-center">{callPct}%</div>}
-          {foldPct > 0 && <div style={{ width: `${foldPct}%` }} className="bg-zinc-700 text-[10px] font-bold text-zinc-200 flex items-center justify-center">{foldPct}%</div>}
+          {raisePct > 0 && <div style={{ width: `${raisePct}%` }} className="bg-red-600 text-sm font-bold text-white flex items-center justify-center">{raisePct}%</div>}
+          {callPct > 0 && <div style={{ width: `${callPct}%` }} className="bg-emerald-600 text-sm font-bold text-white flex items-center justify-center">{callPct}%</div>}
+          {foldPct > 0 && <div style={{ width: `${foldPct}%` }} className="bg-zinc-700 text-sm font-bold text-zinc-200 flex items-center justify-center">{foldPct}%</div>}
         </div>
       </div>
 
       {/* Morphology Educational Grid */}
       <div className="space-y-3">
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-m3-primary">
+        <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-m3-primary">
           <Lightbulb className="w-4 h-4 text-m3-primary" />
           <span>Hand Morphology & Strategic Concept</span>
         </div>
@@ -153,7 +153,7 @@ export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
           </div>
         </div>
 
-        <div className="p-3 bg-m3-surfaceContainerHigh border border-m3-outlineVariant rounded-m3-sm text-xs text-m3-onSurfaceVariant leading-relaxed italic">
+        <div className="p-3 bg-m3-surfaceContainerHigh border border-m3-outlineVariant rounded-m3-sm text-sm text-m3-onSurfaceVariant leading-relaxed italic">
           "{insight.explanation}"
         </div>
       </div>

@@ -282,7 +282,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
 
           <button
             onClick={generateNewHand}
-            className="px-4 py-1.5 bg-m3-surfaceContainerHigh hover:bg-m3-surfaceBright text-m3-onSurface font-bold rounded-m3-xs text-xs flex items-center gap-2 transition-colors border border-m3-outlineVariant shadow-sm"
+            className="px-4 py-1.5 bg-m3-surfaceContainerHigh hover:bg-m3-surfaceBright text-m3-onSurface font-bold rounded-m3-xs text-sm flex items-center gap-2 transition-colors border border-m3-outlineVariant shadow-sm"
           >
             <RefreshCw className="w-3.5 h-3.5 text-m3-primary" />
             <span>New Hand</span>
@@ -350,14 +350,14 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               <span className="text-2xl font-black tracking-tight text-m3-onSurface bg-m3-surfaceContainerHigh px-4 py-1.5 rounded-m3-xs border border-m3-outline">
                 {handNotation}
               </span>
-              <span className="text-sm text-m3-onSurfaceVariant font-bold">
+              <span className="text-base text-m3-onSurfaceVariant font-bold">
                 Hero: {formatPositionLabel(currentSpot.heroPosition)}
               </span>
             </div>
 
             <button
               onClick={() => setShowPositionalMatrix(true)}
-              className="px-3.5 py-1.5 bg-amber-950/80 hover:bg-amber-900 border border-amber-500/80 text-amber-300 rounded-m3-xs text-xs font-bold flex items-center gap-2 transition-colors shadow-sm"
+              className="px-3.5 py-1.5 bg-amber-950/80 hover:bg-amber-900 border border-amber-500/80 text-amber-300 rounded-m3-xs text-sm font-bold flex items-center gap-2 transition-colors shadow-sm"
               title="See what this hand would do from every position around the table"
             >
               <UserCheck className="w-4 h-4 text-amber-400" />
@@ -367,7 +367,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
 
           {/* Action Buttons & GTO Math Toolbar */}
           <div className="w-full max-w-xl md:max-w-2xl lg:max-w-3xl space-y-3">
-            <div className="text-xs font-bold text-m3-onSurfaceVariant text-center uppercase tracking-wider mb-2">
+            <div className="text-base font-bold text-m3-onSurfaceVariant text-center uppercase tracking-wider mb-2">
               {isAmateurMode ? 'Select Optimal Exploitative Play' : 'Select Optimal GTO Play'}
             </div>
 
@@ -376,14 +376,14 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               <button
                 onClick={() => handleActionPick('fold')}
                 disabled={userAction !== null}
-                className={`py-3 px-4 rounded-m3-xs font-black text-xs transition-all flex flex-col items-center justify-center border shadow ${
+                className={`py-4 px-5 rounded-m3-xs font-black text-base transition-all flex flex-col items-center justify-center border shadow ${
                   userAction === 'fold'
                     ? 'bg-zinc-700 border-white text-white ring-2 ring-white'
                     : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border-zinc-600'
                 }`}
               >
                 <span>FOLD</span>
-                <span className="text-[10px] text-zinc-400 font-normal mt-0.5">(Key 1)</span>
+                <span className="text-xs text-zinc-400 font-normal mt-0.5">(Key 1)</span>
               </button>
 
               {/* CALL BUTTON */}
@@ -416,7 +416,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                     }
                   }}
                   disabled={userAction !== null && currentSpot.allowedActions.includes('call')}
-                  className={`w-full py-3 px-4 rounded-m3-xs font-black text-xs transition-all flex flex-col items-center justify-center border shadow relative ${
+                  className={`w-full py-4 px-5 rounded-m3-xs font-black text-base transition-all flex flex-col items-center justify-center border shadow relative ${
                     !currentSpot.allowedActions.includes('call')
                       ? 'bg-zinc-900 text-zinc-500 border-zinc-800 opacity-50 cursor-help hover:border-zinc-700 hover:text-zinc-300'
                       : userAction === 'call'
@@ -431,7 +431,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                       <HelpCircle className="w-3 h-3 text-zinc-500 shrink-0" />
                     )}
                   </div>
-                  <span className={`text-[10px] font-normal mt-0.5 ${
+                  <span className={`text-xs font-normal mt-0.5 ${
                     !currentSpot.allowedActions.includes('call')
                       ? 'text-zinc-500'
                       : 'text-emerald-200'
@@ -446,20 +446,20 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                 type="button"
                 onClick={() => handleActionPick('raise')}
                 disabled={userAction !== null}
-                className={`py-3 px-4 rounded-m3-xs font-black text-xs transition-all flex flex-col items-center justify-center border shadow ${
+                className={`py-4 px-5 rounded-m3-xs font-black text-base transition-all flex flex-col items-center justify-center border shadow ${
                   userAction === 'raise'
                     ? 'bg-red-600 border-white text-white ring-2 ring-white'
                     : 'bg-red-700 hover:bg-red-600 text-white border-red-500'
                 }`}
               >
                 <span>{currentSpot.raiseLabel.split(' ')[0]}</span>
-                <span className="text-[10px] text-red-200 font-normal mt-0.5">(Key 3)</span>
+                <span className="text-xs text-red-200 font-normal mt-0.5">(Key 3)</span>
               </button>
             </div>
 
             {/* Call Disabled Context Card */}
             {!currentSpot.allowedActions.includes('call') && (isCallHovered || showCallDisabledInfo) && (
-              <div className="mt-3 p-3.5 bg-zinc-900 border border-zinc-700 rounded-m3-xs text-left text-xs space-y-2 shadow-xl animate-fadeIn relative">
+              <div className="mt-3 p-4 bg-zinc-900 border border-zinc-700 rounded-m3-xs text-left text-sm space-y-2 shadow-xl animate-fadeIn relative">
                 <button 
                   type="button"
                   onClick={() => setShowCallDisabledInfo(false)}
@@ -472,10 +472,10 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                 <div className="flex items-start gap-2.5">
                   <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                   <div className="space-y-1.5 pr-4">
-                    <div className="font-bold text-amber-300 text-xs">
+                    <div className="font-bold text-amber-300 text-sm">
                       Why is CALL disabled in {formatPositionLabel(currentSpot.heroPosition)} {currentSpot.category === 'rfi' ? 'RFI' : ''}?
                     </div>
-                    <p className="text-zinc-300 text-[11px] leading-relaxed">
+                    <p className="text-zinc-300 text-sm leading-relaxed">
                       <strong className="text-white">GTO Standard:</strong> In unopened preflop pots from early & late positions ({formatPositionLabel(currentSpot.heroPosition)}), GTO mandates a strict <em>Raise-or-Fold</em> strategy. Open-calling (limping) forfeits pot initiative, gives away preflop equity, and invites players behind to squeeze or over-realize equity.
                     </p>
                   </div>
@@ -498,10 +498,10 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               </div>
               
               <div>
-                <h3 className="text-sm font-bold text-m3-onSurface">
+                <h3 className="text-base font-bold text-m3-onSurface">
                   {isAmateurMode ? 'Amateur Exploit Matrix Locked' : 'GTO Solution Matrix Locked'}
                 </h3>
-                <p className="text-xs text-m3-onSurfaceVariant font-medium mt-1 max-w-sm mx-auto leading-relaxed">
+                <p className="text-sm text-m3-onSurfaceVariant font-medium mt-1 max-w-sm mx-auto leading-relaxed">
                   Make your decision or press <strong className="text-amber-400 font-mono">H</strong> for a hint.
                 </p>
               </div>
@@ -509,7 +509,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               <div className="flex justify-center">
                 <button
                   onClick={() => setShowHint(true)}
-                  className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 rounded-m3-xs text-xs flex items-center gap-2 transition-colors"
+                  className="px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 rounded-m3-xs text-sm flex items-center gap-2 transition-colors"
                 >
                   <Eye className="w-4 h-4 text-amber-400" />
                   <span>Reveal Solution Hint (Key H)</span>
@@ -518,11 +518,11 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
 
               {isAmateurMode && activeAmateurProfile && (
                 <div className="bg-amber-950/40 p-3.5 rounded-m3-xs border border-amber-500/40 text-left space-y-1.5">
-                  <div className="text-xs font-bold text-amber-300 flex items-center gap-1.5 uppercase">
+                  <div className="text-sm font-bold text-amber-300 flex items-center gap-1.5 uppercase">
                     <Zap className="w-3.5 h-3.5 text-amber-400" />
                     <span>Targeting Opponent Tendency:</span>
                   </div>
-                  <ul className="text-xs text-zinc-300 space-y-1 font-medium list-disc list-inside">
+                  <ul className="text-sm text-zinc-300 space-y-1 font-medium list-disc list-inside">
                     <li><strong>RFI:</strong> {activeAmateurProfile.tendencies.rfiTendency}</li>
                     <li><strong>Facing Open:</strong> {activeAmateurProfile.tendencies.facingOpenTendency}</li>
                     <li><strong>Facing 3-Bet:</strong> {activeAmateurProfile.tendencies.facing3betTendency}</li>
@@ -553,14 +553,14 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow overflow-hidden space-y-3">
                 <div className={`p-3 rounded-m3-xs border flex flex-col gap-1 ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs uppercase font-extrabold tracking-wider text-m3-onSurface">
+                    <span className="text-sm uppercase font-extrabold tracking-wider text-m3-onSurface">
                       Spot Range Morphology
                     </span>
                     <span className={`px-2.5 py-0.5 font-black text-xs uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.borderColor}`}>
                       {morphologyMeta.label}
                     </span>
                   </div>
-                  <p className="text-xs font-semibold text-zinc-300 leading-snug mt-0.5">
+                  <p className="text-sm font-semibold text-zinc-300 leading-snug mt-0.5">
                     {currentSpot.morphologyDescription}
                   </p>
                 </div>

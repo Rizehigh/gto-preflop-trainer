@@ -97,7 +97,7 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
   };
 
   return (
-    <div className="fixed left-4 top-28 z-40 flex flex-col w-[320px] sm:w-[360px] bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md shadow-2xl overflow-hidden animate-fadeIn">
+    <div className="fixed left-4 top-24 z-40 flex flex-col w-full max-w-xl md:max-w-2xl bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md shadow-2xl overflow-hidden animate-fadeIn" style={{ maxWidth: '672px' }}>
       
       {/* Header */}
       <div className="p-3 bg-m3-surfaceContainerHigh border-b border-m3-outlineVariant flex items-center justify-between">
@@ -170,8 +170,8 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
 
       {/* 13x13 Grid Matrix - Same layout as RangeGrid */}
       <div className="p-3 flex-1 overflow-auto">
-        <div className="w-full bg-zinc-950 p-1.5 sm:p-2 rounded-m3-md border border-m3-outlineVariant shadow-inner overflow-hidden">
-          <div className="grid grid-cols-13 gap-0.5">
+        <div className="w-full bg-zinc-950 p-2 sm:p-4 rounded-m3-md border border-m3-outlineVariant shadow-inner overflow-hidden">
+          <div className="grid grid-cols-13 gap-0.5 sm:gap-1">
             {RANKS.map((r1, rowIndex) =>
               RANKS.map((r2, colIndex) => {
                 const notation = getMatrixHandNotation(rowIndex, colIndex);
@@ -183,7 +183,7 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
                   <button
                     key={notation}
                     style={bgStyle}
-                    className={`aspect-square flex items-center justify-center rounded-m3-xs text-[8px] sm:text-[9px] font-bold text-white transition-all transform hover:scale-110 hover:z-30 hover:shadow-lg focus:outline-none relative overflow-hidden ${isCurrentHand ? 'ring-2 ring-amber-400 ring-offset-0.5 ring-offset-black scale-110 z-20 font-black' : ''}`}
+                    className={`aspect-square flex items-center justify-center rounded-m3-xs text-[9px] sm:text-xs md:text-sm font-bold text-white transition-all transform hover:scale-110 hover:z-30 hover:shadow-lg focus:outline-none relative overflow-hidden ${isCurrentHand ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-black scale-105 z-20 font-black' : ''}`}
                     title={`${notation}: Raise ${Math.round((freq?.raise || 0) * 100)}%, Call ${Math.round((freq?.call || 0) * 100)}%, Fold ${Math.round((freq?.fold || 0) * 100)}%`}
                   >
                     <span className="drop-shadow-sm font-mono tracking-tighter">{notation}</span>

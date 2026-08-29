@@ -380,7 +380,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
           </div>
 
           {/* Action Buttons & GTO Math Toolbar */}
-          <div className="w-full max-w-xl md:max-w-2xl lg:max-w-3xl space-y-3">
+          <div className="w-full max-w-xl md:max-w-2xl lg:max-w-3xl space-y-3 relative">
             <div className="text-base font-bold text-m3-onSurfaceVariant text-center uppercase tracking-wider mb-2">
               {isExploitMode ? 'Select Optimal Exploitative Play' : 'Select Optimal GTO Play'}
             </div>
@@ -471,9 +471,9 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               </button>
             </div>
 
-            {/* Call Disabled Context Card */}
+            {/* Call Disabled Context Card (Absolute overlay to prevent layout height changes & scrollbar shifting) */}
             {!currentSpot.allowedActions.includes('call') && (isCallHovered || showCallDisabledInfo) && (
-              <div className="mt-3 p-4 bg-zinc-900 border border-zinc-700 rounded-m3-xs text-left text-sm space-y-2 shadow-xl animate-fadeIn relative">
+              <div className="absolute top-[calc(100%-0.5rem)] left-0 right-0 z-30 p-4 bg-zinc-900/98 border border-zinc-700 rounded-m3-xs text-left text-sm space-y-2 shadow-2xl animate-fadeIn">
                 <button 
                   type="button"
                   onClick={() => setShowCallDisabledInfo(false)}

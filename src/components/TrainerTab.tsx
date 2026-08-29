@@ -324,8 +324,24 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
         </div>
       )}
 
+      {/* Positional Range Grid Inspector (Fixed Left Sidebar) */}
+      {showPositionalGrid && (
+        <PositionalRangeGrid
+          handNotation={handNotation}
+          tableSize={tableSize}
+          currentHeroPosition={currentSpot.heroPosition}
+          onClose={() => setShowPositionalGrid(false)}
+          onSelectPositionSpot={(spot) => {
+            setCurrentSpot(spot);
+            setUserAction(null);
+            setShowHint(false);
+            setEvaluation(null);
+          }}
+        />
+      )}
+
       {/* Main Grid Container - shifts right when inspector is open */}
-      <div className={`grid grid-cols-1 lg:grid-cols-12 gap-4 items-start transition-transform duration-300 ${showPositionalGrid ? 'lg:translate-x-[340px]' : ''}`}>
+      <div className={`grid grid-cols-1 lg:grid-cols-12 gap-4 items-start transition-transform duration-500 ease-in-out ${showPositionalGrid ? 'lg:translate-x-[480px] xl:translate-x-[540px]' : ''}`}>
         
         {/* Main Column: Poker Table & Action Controls */}
         <div className="lg:col-span-6 flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 shadow-sm relative space-y-4">

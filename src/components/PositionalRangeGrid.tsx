@@ -97,10 +97,10 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
   };
 
   return (
-    <div className="fixed left-4 top-24 z-40 flex flex-col w-[320px] bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md shadow-2xl overflow-hidden animate-fadeIn">
+    <div className="fixed left-4 top-20 z-50 flex flex-col w-[340px] sm:w-[450px] md:w-[520px] max-h-[calc(100vh-6rem)] bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md shadow-2xl overflow-y-auto animate-fadeIn">
       
       {/* Header */}
-      <div className="p-3 bg-m3-surfaceContainerHigh border-b border-m3-outlineVariant flex items-center justify-between">
+      <div className="p-3 bg-m3-surfaceContainerHigh border-b border-m3-outlineVariant flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-2">
           <UserCheck className="w-4 h-4 text-amber-400" />
           <span className="text-sm font-bold text-m3-onSurface">Position Inspector</span>
@@ -116,19 +116,20 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
       {/* Hand Display & Position Selector */}
       <div className="px-3 py-2.5 border-b border-m3-outlineVariant/50 bg-m3-surfaceContainer/50">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-lg font-black font-mono text-amber-400 bg-m3-surfaceContainerHigh px-2.5 py-1 rounded-m3-xs border border-m3-outline">
-            {handNotation}
-          </span>
-          <span className="text-xs text-m3-onSurfaceVariant font-medium">
-            RFI Strategy
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-black font-mono text-amber-400 bg-m3-surfaceContainerHigh px-2.5 py-1 rounded-m3-xs border border-m3-outline">
+              {handNotation}
+            </span>
+            <span className="text-xs text-m3-onSurfaceVariant font-medium">
+              RFI Strategy ({tableSize}-Max)
+            </span>
+          </div>
         </div>
 
         {/* Position Buttons */}
         <div className="flex flex-wrap gap-1.5">
           {positions.map((pos) => {
             const freq = currentRanges[handNotation] || { raise: 0, call: 0, fold: 1 };
-            const r = Math.round((freq.raise || 0) * 100);
             const isCurrentHero = pos === currentHeroPosition;
             const isSelected = pos === selectedPosition;
 
@@ -136,8 +137,8 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
               <button
                 key={pos}
                 onClick={() => handlePositionSelect(pos)}
-                className={`px-2 py-1 text-xs font-bold rounded-m3-xs transition-all border ${isSelected
-                  ? 'bg-amber-500 text-zinc-950 border-amber-400 shadow-sm'
+                className={`px-2.5 py-1 text-xs font-bold rounded-m3-xs transition-all border ${isSelected
+                  ? 'bg-amber-500 text-zinc-950 border-amber-400 shadow-sm font-extrabold'
                   : isCurrentHero
                     ? 'bg-amber-950/60 text-amber-300 border-amber-500/50 hover:bg-amber-900/60'
                     : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700'
@@ -150,8 +151,8 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
         </div>
       </div>
 
-      {/* Position Info */}
-      <div className="px-3 py-2 border-b border-m3-outlineVariant/50">
+      {/* Position Info & GTO Math */}
+      <div className="px-3 py-2 border-b border-m3-outlineVariant/50 space-y-1">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm font-extrabold text-amber-400 font-mono">{selectedPosition}</span>
@@ -159,18 +160,24 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
               {structureMeta.label}
             </span>
           </div>
-          <span className="text-[10px] text-zinc-500 font-medium">
-            {currentMath?.playersBehind} players behind
+          <span className="text-xs text-amber-300 font-bold font-mono">
+            {currentMath?.gtoRfiFrequency}% GTO RFI
           </span>
         </div>
-        <p className="text-[11px] text-zinc-400 font-medium mt-1 leading-snug">
+
+        <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-0.5">
+          <span>{currentMath?.playersBehind} players behind</span>
+          <span>Risk behind: <strong className="text-red-400">{currentMath?.probabilityPremiumBehind}%</strong></span>
+        </div>
+
+        <p className="text-[11px] text-zinc-400 font-medium leading-snug pt-0.5">
           {currentDescription}
         </p>
       </div>
 
-      {/* 13x13 Grid Matrix - Same layout as RangeGrid */}
-      <div className="p-3 flex-1 overflow-auto">
-        <div className="w-full bg-zinc-950 p-2 sm:p-4 rounded-m3-md border border-m3-outlineVariant shadow-inner overflow-hidden">
+      {/* 13x13 Grid Matrix Container */}
+      <div className="p-3 flex-1">
+        <div className="w-full bg-zinc-950 p-2 rounded-m3-md border border-m3-outlineVariant shadow-inner overflow-hidden">
           <div className="grid grid-cols-13 gap-0.5 sm:gap-1">
             {RANKS.map((r1, rowIndex) =>
               RANKS.map((r2, colIndex) => {
@@ -183,7 +190,9 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
                   <button
                     key={notation}
                     style={bgStyle}
-                    className={`aspect-square flex items-center justify-center rounded-m3-xs text-[9px] sm:text-xs md:text-sm font-bold text-white transition-all transform hover:scale-110 hover:z-30 hover:shadow-lg focus:outline-none relative overflow-hidden ${isCurrentHand ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-black scale-105 z-20 font-black' : ''}`}
+                    className={`aspect-square flex items-center justify-center rounded-m3-xs text-[8px] sm:text-[10px] md:text-xs font-bold text-white transition-all transform hover:scale-110 hover:z-30 hover:shadow-lg focus:outline-none relative overflow-hidden ${
+                      isCurrentHand ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-black scale-105 z-20 font-black' : ''
+                    }`}
                     title={`${notation}: Raise ${Math.round((freq?.raise || 0) * 100)}%, Call ${Math.round((freq?.call || 0) * 100)}%, Fold ${Math.round((freq?.fold || 0) * 100)}%`}
                   >
                     <span className="drop-shadow-sm font-mono tracking-tighter">{notation}</span>
@@ -219,22 +228,26 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
       </div>
 
       {/* Navigation Footer */}
-      <div className="px-3 py-2 bg-m3-surfaceContainerHigh border-t border-m3-outlineVariant flex items-center justify-between">
+      <div className="px-3 py-2 bg-m3-surfaceContainerHigh border-t border-m3-outlineVariant flex items-center justify-between sticky bottom-0 z-10">
         <button
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className={`p-1.5 rounded-m3-xs transition-colors ${currentIndex === 0 ? 'text-zinc-600 cursor-not-allowed' : 'text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHighest'}`}
+          className={`px-2 py-1 rounded-m3-xs transition-colors flex items-center gap-1 text-xs font-bold ${currentIndex === 0 ? 'text-zinc-600 cursor-not-allowed' : 'text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHighest'}`}
         >
           <ChevronLeft className="w-4 h-4" />
+          <span>Prev</span>
         </button>
-        <span className="text-xs text-zinc-500 font-medium">
-          {currentIndex + 1} / {positions.length}
+
+        <span className="text-xs text-zinc-400 font-mono font-bold">
+          {selectedPosition} ({currentIndex + 1} / {positions.length})
         </span>
+
         <button
           onClick={handleNext}
           disabled={currentIndex === positions.length - 1}
-          className={`p-1.5 rounded-m3-xs transition-colors ${currentIndex === positions.length - 1 ? 'text-zinc-600 cursor-not-allowed' : 'text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHighest'}`}
+          className={`px-2 py-1 rounded-m3-xs transition-colors flex items-center gap-1 text-xs font-bold ${currentIndex === positions.length - 1 ? 'text-zinc-600 cursor-not-allowed' : 'text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHighest'}`}
         >
+          <span>Next</span>
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>

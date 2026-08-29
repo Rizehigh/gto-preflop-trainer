@@ -9,6 +9,7 @@ import { PlayingCard } from './PlayingCard';
 import { MorphologyExplanation } from './MorphologyExplanation';
 import { RangeGrid } from './RangeGrid';
 import { PositionalHandMatrixModal } from './PositionalHandMatrixModal';
+import { PositionalRangeGrid } from './PositionalRangeGrid';
 import { GtoMathToolbar } from './GtoMathToolbar';
 import { Filter, RefreshCw, ShieldAlert, Lock, Eye, GraduationCap, Lightbulb, Users, UserCheck, HelpCircle, Info, X, Sparkles, Target, Zap } from 'lucide-react';
 
@@ -31,6 +32,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const [showCallDisabledInfo, setShowCallDisabledInfo] = useState<boolean>(false);
   const [isCallHovered, setIsCallHovered] = useState<boolean>(false);
   const [showRangeMatrix, setShowRangeMatrix] = useState<boolean>(false);
+  const [showPositionalGrid, setShowPositionalGrid] = useState<boolean>(false);
 
   // Exploitative Mode States
   const [isExploitMode, setIsExploitMode] = useState<boolean>(false);
@@ -323,10 +325,27 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
       )}
 
       {/* Main Grid Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        
+        {/* Left Column: Positional Range Grid Inspector (toggleable) */}
+        {showPositionalGrid && (
+          <PositionalRangeGrid
+            handNotation={handNotation}
+            tableSize={tableSize}
+            currentHeroPosition={currentSpot.heroPosition}
+            onClose={() => setShowPositionalGrid(false)}
+            onSelectPositionSpot={(spot) => {
+              setCurrentSpot(spot);
+              setUserAction(null);
+              setShowHint(false);
+              setEvaluation(null);
+              setShowPositionalGrid(false);
+            }}
+          />
+        )}
         
         {/* Main Column: Poker Table & Action Controls */}
-        <div className="lg:col-span-6 flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 shadow-sm relative space-y-4">
+        <div className={`flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 shadow-sm relative space-y-4 ${showPositionalGrid ? 'lg:col-span-5' : 'lg:col-span-6'}`}>
           
           <PokerTable
             heroPosition={currentSpot.heroPosition}
@@ -356,12 +375,12 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             </div>
 
             <button
-              onClick={() => setShowPositionalMatrix(true)}
-              className="px-3.5 py-1.5 bg-amber-950/80 hover:bg-amber-900 border border-amber-500/80 text-amber-300 rounded-m3-xs text-sm font-bold flex items-center gap-2 transition-colors shadow-sm"
+              onClick={() => setShowPositionalGrid(!showPositionalGrid)}
+              className={`px-3.5 py-1.5 border rounded-m3-xs text-sm font-bold flex items-center gap-2 transition-colors shadow-sm ${showPositionalGrid ? 'bg-amber-500 text-zinc-950 border-amber-400' : 'bg-amber-950/80 hover:bg-amber-900 border-amber-500/80 text-amber-300'}`}
               title="See what this hand would do from every position around the table"
             >
-              <UserCheck className="w-4 h-4 text-amber-400" />
-              <span>Inspect {handNotation} Across All Positions</span>
+              <UserCheck className={`w-4 h-4 ${showPositionalGrid ? 'text-zinc-950' : 'text-amber-400'}`} />
+              <span>{showPositionalGrid ? 'Hide Inspector' : `Inspect ${handNotation} Across All Positions`}</span>
             </button>
           </div>
 

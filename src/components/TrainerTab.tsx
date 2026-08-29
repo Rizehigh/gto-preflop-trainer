@@ -180,7 +180,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const activeOpponentProfile = isExploitMode ? OPPONENT_PROFILES[activeOpponentId] : null;
 
   return (
-    <div className={`w-full mx-auto space-y-5 ${showPositionalGrid ? 'max-w-[1700px]' : 'max-w-7xl'}`}>
+    <div className="w-full max-w-7xl mx-auto space-y-5">
       
       {/* Mode & Controls Header */}
       <div className="bg-m3-surfaceContainerLow border border-m3-outline p-4 rounded-m3-md flex flex-wrap items-center justify-between gap-4 shadow-sm">
@@ -324,30 +324,11 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
         </div>
       )}
 
-      {/* Main Grid Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        
-        {/* Left Column: Positional Range Grid Inspector (toggleable) */}
-        {showPositionalGrid && (
-          <div className="lg:col-span-4 w-full">
-            <PositionalRangeGrid
-              handNotation={handNotation}
-              tableSize={tableSize}
-              currentHeroPosition={currentSpot.heroPosition}
-              onClose={() => setShowPositionalGrid(false)}
-              onSelectPositionSpot={(spot) => {
-                setCurrentSpot(spot);
-                setUserAction(null);
-                setShowHint(false);
-                setEvaluation(null);
-                // Keep Inspector open when switching positions/spots
-              }}
-            />
-          </div>
-        )}
+      {/* Main Grid Container - shifts right when inspector is open */}
+      <div className={`grid grid-cols-1 lg:grid-cols-12 gap-4 items-start transition-transform duration-300 ${showPositionalGrid ? 'lg:translate-x-[340px]' : ''}`}>
         
         {/* Main Column: Poker Table & Action Controls */}
-        <div className={`flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 shadow-sm relative space-y-4 ${showPositionalGrid ? 'lg:col-span-4' : 'lg:col-span-6'}`}>
+        <div className="lg:col-span-6 flex flex-col items-center bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 shadow-sm relative space-y-4">
           
           <PokerTable
             heroPosition={currentSpot.heroPosition}
@@ -510,7 +491,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
         </div>
 
         {/* Right Column: Solution Grid & Feedback */}
-        <div className={`space-y-4 flex flex-col items-center w-full ${showPositionalGrid ? 'lg:col-span-4' : 'lg:col-span-6'}`}>
+        <div className="lg:col-span-6 space-y-4 flex flex-col items-center w-full">
           {userAction === null && !showHint ? (
             /* Pre-Decision Locked State */
             <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 text-center space-y-4 shadow">

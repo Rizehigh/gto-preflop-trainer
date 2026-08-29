@@ -97,7 +97,7 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md shadow-lg overflow-hidden animate-fadeIn">
+    <div className="fixed left-4 top-24 z-40 flex flex-col w-[320px] bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md shadow-2xl overflow-hidden animate-fadeIn">
       
       {/* Header */}
       <div className="p-3 bg-m3-surfaceContainerHigh border-b border-m3-outlineVariant flex items-center justify-between">

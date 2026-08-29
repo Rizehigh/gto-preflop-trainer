@@ -97,10 +97,10 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
   };
 
   return (
-    <div className="fixed left-4 top-20 z-50 flex flex-col w-[340px] sm:w-[450px] md:w-[520px] max-h-[calc(100vh-6rem)] bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md shadow-2xl overflow-y-auto animate-fadeIn">
+    <div className="flex flex-col w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md shadow-sm overflow-hidden animate-fadeIn space-y-0">
       
       {/* Header */}
-      <div className="p-3 bg-m3-surfaceContainerHigh border-b border-m3-outlineVariant flex items-center justify-between sticky top-0 z-10">
+      <div className="p-3 bg-m3-surfaceContainerHigh border-b border-m3-outlineVariant flex items-center justify-between">
         <div className="flex items-center gap-2">
           <UserCheck className="w-4 h-4 text-amber-400" />
           <span className="text-sm font-bold text-m3-onSurface">Position Inspector</span>
@@ -129,7 +129,6 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
         {/* Position Buttons */}
         <div className="flex flex-wrap gap-1.5">
           {positions.map((pos) => {
-            const freq = currentRanges[handNotation] || { raise: 0, call: 0, fold: 1 };
             const isCurrentHero = pos === currentHeroPosition;
             const isSelected = pos === selectedPosition;
 
@@ -228,7 +227,7 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
       </div>
 
       {/* Navigation Footer */}
-      <div className="px-3 py-2 bg-m3-surfaceContainerHigh border-t border-m3-outlineVariant flex items-center justify-between sticky bottom-0 z-10">
+      <div className="px-3 py-2 bg-m3-surfaceContainerHigh border-t border-m3-outlineVariant flex items-center justify-between">
         <button
           onClick={handlePrev}
           disabled={currentIndex === 0}

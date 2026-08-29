@@ -1,7 +1,8 @@
 import React from 'react';
-import { BookOpen, Layers, Zap, Compass, Users } from 'lucide-react';
+import { BookOpen, Layers, Zap, Compass, Users, HelpCircle, Sparkles } from 'lucide-react';
 import { GtoMathSection } from './GtoMathSection';
 import { RangeQuizSection } from './RangeQuizSection';
+import { MORPHOLOGY_MNEMONICS, MATRIX_ARROW_MNEMONIC } from '../data/shapeMnemonics';
 
 export const GuideTab: React.FC = () => {
   return (
@@ -37,28 +38,51 @@ export const GuideTab: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
           <div className="bg-m3-surfaceContainerHigh p-4 rounded-m3-xs border border-m3-outlineVariant">
-            <div className="text-xs font-bold text-amber-300 uppercase tracking-wider">Diagonal Cells</div>
+            <div className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+              <span>🎯</span>
+              <span>Diagonal Spine</span>
+            </div>
             <div className="text-sm font-bold text-m3-onSurface mt-1">13 Pocket Pairs (AA – 22)</div>
             <p className="text-xs text-m3-onSurfaceVariant font-medium mt-1">
-              Runs top-left (AA) to bottom-right (22). Each pair has 6 suit combinations.
+              Runs top-left (AA) to bottom-right (22). Central diagonal arrowhead of the grid. (6 combos each).
             </p>
           </div>
 
           <div className="bg-m3-surfaceContainerHigh p-4 rounded-m3-xs border border-m3-outlineVariant">
-            <div className="text-xs font-bold text-m3-primary uppercase tracking-wider">Upper Right Triangle</div>
+            <div className="text-xs font-bold text-m3-primary uppercase tracking-wider flex items-center gap-1.5">
+              <span>🦅</span>
+              <span>Upper Suited Wing</span>
+            </div>
             <div className="text-sm font-bold text-m3-onSurface mt-1">78 Suited Hands (e.g. AKs)</div>
             <p className="text-xs text-m3-onSurfaceVariant font-medium mt-1">
-              Marked with "s". Each suited hand has 4 combinations.
+              Marked with "s". +3-4% equity bonus + flush draws. Soars far out to top-right. (4 combos each).
             </p>
           </div>
 
           <div className="bg-m3-surfaceContainerHigh p-4 rounded-m3-xs border border-m3-outlineVariant">
-            <div className="text-xs font-bold text-m3-onSurfaceVariant uppercase tracking-wider">Lower Left Triangle</div>
+            <div className="text-xs font-bold text-m3-onSurfaceVariant uppercase tracking-wider flex items-center gap-1.5">
+              <span>🪵</span>
+              <span>Lower Offsuit Stub</span>
+            </div>
             <div className="text-sm font-bold text-m3-onSurface mt-1">78 Offsuit Hands (e.g. AKo)</div>
             <p className="text-xs text-m3-onSurfaceVariant font-medium mt-1">
-              Marked with "o". Each offsuit hand has 12 combinations.
+              Marked with "o". No flush equity & reverse implied odds. Shrinks close to diagonal. (12 combos each).
             </p>
           </div>
+        </div>
+
+        {/* 13x13 Arrowhead Mnemonic Memory Banner */}
+        <div className="bg-amber-950/30 border border-amber-500/40 rounded-m3-xs p-4 space-y-2">
+          <div className="flex items-center gap-2 text-amber-300 font-extrabold text-xs uppercase tracking-wider">
+            <Sparkles className="w-4 h-4 text-amber-400" />
+            <span>Memory Mnemonic: The 13x13 GTO Arrowhead</span>
+          </div>
+          <p className="text-sm font-bold text-amber-200 italic font-mono leading-relaxed">
+            {MATRIX_ARROW_MNEMONIC.mnemonicPhrase}
+          </p>
+          <p className="text-xs text-zinc-300 leading-relaxed font-medium">
+            <strong>Why GTO ranges look like an Arrowhead:</strong> Suited hands (wings) stay playable far lower in rank than offsuit hands (stubs). When visualising opening ranges from UTG to BTN, picture a sharp spearhead expanding outwards along the diagonal spine!
+          </p>
         </div>
       </div>
 
@@ -103,10 +127,50 @@ export const GuideTab: React.FC = () => {
       <div className="bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 shadow-sm space-y-4">
         <h3 className="text-base font-bold text-m3-onSurface flex items-center gap-2">
           <Zap className="w-4 h-4 text-m3-primary" />
-          <span>3. Core Principles of Hand Morphology</span>
+          <span>3. Hand Morphology & 4 Range Shapes (With Mnemonics)</span>
         </h3>
+        <p className="text-xs text-m3-onSurfaceVariant leading-relaxed font-medium">
+          GTO preflop ranges form 4 distinct visual patterns on the 13x13 grid. Memorize these shape mnemonics to instantly recognize optimal preflop strategies:
+        </p>
 
+        {/* 4 Range Shapes Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium">
+          {Object.values(MORPHOLOGY_MNEMONICS).map((m) => (
+            <div 
+              key={m.id}
+              className={`p-4 rounded-m3-xs border space-y-2 shadow-sm ${
+                m.id === 'linear'
+                  ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-200'
+                  : m.id === 'polarized'
+                  ? 'bg-red-950/40 border-red-500/50 text-red-200'
+                  : m.id === 'condensed'
+                  ? 'bg-amber-950/40 border-amber-500/50 text-amber-200'
+                  : 'bg-purple-950/40 border-purple-500/50 text-purple-200'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 font-bold text-sm text-white">
+                  <span className="text-base">{m.shapeIcon}</span>
+                  <span>{m.name} ({m.shapeName})</span>
+                </div>
+              </div>
+
+              <div className="p-2 rounded bg-black/40 font-mono font-bold text-[11.5px] italic border border-white/10 text-amber-300">
+                {m.mnemonicPhrase}
+              </div>
+
+              <p className="text-[11.5px] leading-relaxed text-zinc-300">
+                <strong className="text-white">Grid Pattern:</strong> {m.visualDescription}
+              </p>
+
+              <div className="pt-1.5 border-t border-white/10 text-[11px] text-zinc-400">
+                <strong className="text-zinc-200">Key Takeaway:</strong> {m.keyTakeaway}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium pt-2">
           <div className="bg-m3-surfaceContainerHigh p-4 rounded-m3-xs border border-m3-outlineVariant space-y-1.5">
             <h4 className="font-bold text-amber-300 text-xs">High Card Domination</h4>
             <p className="text-m3-onSurfaceVariant leading-relaxed">

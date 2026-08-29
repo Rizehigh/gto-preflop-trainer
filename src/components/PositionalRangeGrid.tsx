@@ -3,7 +3,8 @@ import { ActionFrequencies, Position, SpotDefinition, TableSize } from '../types
 import { SPOT_DEFINITIONS, getPositionRfiRange } from '../data/gtoRanges';
 import { RANKS, getMatrixHandNotation, getMorphologyStructureMeta } from '../utils/pokerUtils';
 import { calculatePositionMathMetrics, getPositionsForTableSize } from '../utils/gtoMath';
-import { X, UserCheck, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MORPHOLOGY_MNEMONICS } from '../data/shapeMnemonics';
+import { X, UserCheck, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 
 interface PositionalRangeGridProps {
   handNotation: string;
@@ -147,17 +148,23 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
       </div>
 
       {/* Position Info & GTO Math */}
-      <div className="px-3 py-2 border-b border-m3-outlineVariant/50 space-y-1">
+      <div className="px-3 py-2 border-b border-m3-outlineVariant/50 space-y-1.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm font-extrabold text-amber-400 font-mono">{selectedPosition}</span>
             <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-m3-xs border uppercase tracking-wider ${structureMeta.badgeBg} ${structureMeta.textColor} ${structureMeta.borderColor}`}>
-              {structureMeta.label}
+              {MORPHOLOGY_MNEMONICS[currentStructure]?.shapeIcon} {structureMeta.label}
             </span>
           </div>
           <span className="text-xs text-amber-300 font-bold font-mono">
             {currentMath?.gtoRfiFrequency}% GTO RFI
           </span>
+        </div>
+
+        {/* Shape Mnemonic Banner */}
+        <div className="text-[10.5px] font-mono text-amber-300 bg-amber-950/40 border border-amber-500/30 rounded p-1.5 flex items-center gap-1.5">
+          <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          <span>{MORPHOLOGY_MNEMONICS[currentStructure]?.mnemonicPhrase}</span>
         </div>
 
         <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-0.5">

@@ -3,7 +3,8 @@ import { Position, RangeMorphologyStructure, SpotDefinition, TableSize } from '.
 import { SPOT_DEFINITIONS } from '../data/gtoRanges';
 import { getMorphologyStructureMeta } from '../utils/pokerUtils';
 import { calculatePositionMathMetrics, getPositionsForTableSize } from '../utils/gtoMath';
-import { Brain, CheckCircle2, XCircle, HelpCircle, RefreshCw } from 'lucide-react';
+import { MORPHOLOGY_MNEMONICS } from '../data/shapeMnemonics';
+import { Brain, CheckCircle2, XCircle, HelpCircle, RefreshCw, Sparkles } from 'lucide-react';
 
 export const RangeQuizSection: React.FC = () => {
   const [currentSpotIndex, setCurrentSpotIndex] = useState<number>(0);
@@ -15,11 +16,35 @@ export const RangeQuizSection: React.FC = () => {
   const spot = SPOT_DEFINITIONS[currentSpotIndex];
   const heroMath = calculatePositionMathMetrics(spot.heroPosition, tableSize);
 
-  const morphologyOptions: { type: RangeMorphologyStructure; label: string; desc: string }[] = [
-    { type: 'linear', label: 'Linear Range', desc: 'Top-tier hands down to threshold without gaps (e.g. Early Position Open)' },
-    { type: 'polarized', label: 'Polarized Range', desc: 'Nuts + Bluffs with medium hands excluded (e.g. 3-Bet / 4-Bet)' },
-    { type: 'condensed', label: 'Condensed Range', desc: 'Medium strength hands flatting/calling with top hands capped (e.g. BB Defend)' },
-    { type: 'mixed', label: 'Mixed Range', desc: 'Split frequency equilibrium plays (e.g. SB RFI vs BB)' }
+  const morphologyOptions: { type: RangeMorphologyStructure; label: string; desc: string; icon: string; mnemonic: string }[] = [
+    { 
+      type: 'linear', 
+      label: 'Linear Range', 
+      desc: MORPHOLOGY_MNEMONICS.linear.visualDescription,
+      icon: MORPHOLOGY_MNEMONICS.linear.shapeIcon,
+      mnemonic: MORPHOLOGY_MNEMONICS.linear.mnemonicPhrase
+    },
+    { 
+      type: 'polarized', 
+      label: 'Polarized Range', 
+      desc: MORPHOLOGY_MNEMONICS.polarized.visualDescription,
+      icon: MORPHOLOGY_MNEMONICS.polarized.shapeIcon,
+      mnemonic: MORPHOLOGY_MNEMONICS.polarized.mnemonicPhrase
+    },
+    { 
+      type: 'condensed', 
+      label: 'Condensed Range', 
+      desc: MORPHOLOGY_MNEMONICS.condensed.visualDescription,
+      icon: MORPHOLOGY_MNEMONICS.condensed.shapeIcon,
+      mnemonic: MORPHOLOGY_MNEMONICS.condensed.mnemonicPhrase
+    },
+    { 
+      type: 'mixed', 
+      label: 'Mixed Range', 
+      desc: MORPHOLOGY_MNEMONICS.mixed.visualDescription,
+      icon: MORPHOLOGY_MNEMONICS.mixed.shapeIcon,
+      mnemonic: MORPHOLOGY_MNEMONICS.mixed.mnemonicPhrase
+    }
   ];
 
   const frequencyChoices = [
@@ -94,19 +119,23 @@ export const RangeQuizSection: React.FC = () => {
                 key={opt.type}
                 disabled={isSubmitted}
                 onClick={() => setUserMorphology(opt.type)}
-                className={`w-full text-left p-3 rounded-m3-xs border transition-all flex flex-col space-y-0.5 ${
+                className={`w-full text-left p-3 rounded-m3-xs border transition-all flex flex-col space-y-1 ${
                   userMorphology === opt.type
                     ? 'bg-amber-950/60 border-amber-400 text-white ring-1 ring-amber-400/50'
                     : 'bg-m3-surfaceContainerHigh hover:bg-m3-surfaceBright border-m3-outlineVariant text-m3-onSurfaceVariant'
                 } ${isSubmitted ? 'cursor-not-allowed opacity-90' : ''}`}
               >
                 <div className="text-xs font-bold text-amber-200 capitalize flex items-center justify-between">
-                  <span>{opt.label}</span>
+                  <span className="flex items-center gap-1.5">
+                    <span>{opt.icon}</span>
+                    <span>{opt.label}</span>
+                  </span>
                   {isSubmitted && opt.type === actualMorphology && (
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   )}
                 </div>
-                <div className="text-[11px] text-zinc-400 font-medium">{opt.desc}</div>
+                <div className="text-[11px] text-zinc-300 font-medium">{opt.desc}</div>
+                <div className="text-[10px] text-amber-400 font-mono italic">{opt.mnemonic}</div>
               </button>
             ))}
           </div>

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { ActionFrequencies, SpotDefinition } from '../types/poker';
 import { RANKS, getMatrixHandNotation, getMorphologyStructureMeta } from '../utils/pokerUtils';
 import { HandDetailModal } from './HandDetailModal';
-import { User, ShieldAlert } from 'lucide-react';
+import { MORPHOLOGY_MNEMONICS } from '../data/shapeMnemonics';
+import { User, ShieldAlert, Sparkles } from 'lucide-react';
 
 interface RangeGridProps {
   spot: SpotDefinition;
@@ -92,10 +93,14 @@ export const RangeGrid: React.FC<RangeGridProps> = ({
         <div>
           {title && <h3 className="text-sm font-bold text-m3-onSurface">{title}</h3>}
           
-          {/* Morphology Badge */}
-          <div className="flex items-center gap-2 mt-1">
+          {/* Morphology Badge & Mnemonic */}
+          <div className="flex flex-wrap items-center gap-2 mt-1">
             <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-m3-xs border uppercase tracking-wider ${structureMeta.badgeBg} ${structureMeta.textColor} ${structureMeta.borderColor}`}>
-              {structureMeta.label}
+              {MORPHOLOGY_MNEMONICS[activeStructure]?.shapeIcon} {structureMeta.label}
+            </span>
+            <span className="text-[10.5px] font-mono text-amber-300 bg-amber-950/40 border border-amber-500/30 px-2 py-0.5 rounded flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-amber-400 shrink-0" />
+              <span>{MORPHOLOGY_MNEMONICS[activeStructure]?.mnemonicPhrase}</span>
             </span>
             <span className="text-[11px] text-zinc-400 font-medium">
               {activeDescription}

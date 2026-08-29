@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ActionFrequencies, Position, SpotDefinition, TableSize } from '../types/poker';
 import { SPOT_DEFINITIONS, getPositionRfiRange } from '../data/gtoRanges';
-import { RANKS, getMatrixHandNotation } from '../utils/pokerUtils';
+import { RANKS, getMatrixHandNotation, getMorphologyStructureMeta } from '../utils/pokerUtils';
 import { calculatePositionMathMetrics, getPositionsForTableSize } from '../utils/gtoMath';
-import { X, UserCheck, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, UserCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PositionalRangeGridProps {
   handNotation: string;
@@ -21,13 +21,11 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
   onSelectPositionSpot
 }) => {
   const positions = getPositionsForTableSize(tableSize);
-  const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [selectedPosition, setSelectedPosition] = useState<Position>(currentHeroPosition);
 
-  // Get the range for the selected position
-  const getRangeForPosition = (pos: Position): ActionFrequencies => {
-    const rfiRange = getPositionRfiRange(pos);
-    return rfiRange[handNotation] || { raise: 0, call: 0, fold: 1 };
+  // Get the RFI range for a position
+  const getPositionRange = (pos: Position): Record<string, ActionFrequencies> => {
+    return getPositionRfiRange(pos);
   };
 
   // Get the spot definition for a position
@@ -37,6 +35,13 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
       || SPOT_DEFINITIONS[0];
     return matchingSpot;
   };
+
+  const currentSpot = useMemo(() => getSpotForPosition(selectedPosition), [selectedPosition]);
+  const currentMath = useMemo(() => calculatePositionMathMetrics(selectedPosition, tableSize), [selectedPosition, tableSize]);
+  const currentRanges = useMemo(() => getPositionRange(selectedPosition), [selectedPosition]);
+  const currentStructure = currentSpot.morphologyStructure || 'linear';
+  const currentDescription = currentSpot.morphologyDescription || 'RFI range structure.';
+  const structureMeta = getMorphologyStructureMeta(currentStructure);
 
   // Cell background style generator (same as RangeGrid)
   const getCellBgStyle = (freq?: ActionFrequencies) => {
@@ -74,11 +79,7 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
     return { backgroundColor: '#1f242e' };
   };
 
-  const currentRange = selectedPosition ? getRangeForPosition(selectedPosition) : null;
-  const currentMath = selectedPosition ? calculatePositionMathMetrics(selectedPosition, tableSize) : null;
-  const currentSpot = selectedPosition ? getSpotForPosition(selectedPosition) : null;
-
-  const handlePositionClick = (pos: Position) => {
+  const handlePositionSelect = (pos: Position) => {
     setSelectedPosition(pos);
     if (onSelectPositionSpot) {
       const spot = getSpotForPosition(pos);
@@ -86,8 +87,17 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
     }
   };
 
+  // Navigate to previous/next position
+  const currentIndex = positions.indexOf(selectedPosition);
+  const handlePrev = () => {
+    if (currentIndex > 0) handlePositionSelect(positions[currentIndex - 1]);
+  };
+  const handleNext = () => {
+    if (currentIndex < positions.length - 1) handlePositionSelect(positions[currentIndex + 1]);
+  };
+
   return (
-    <div className="hidden lg:flex flex-col w-80 xl:w-96 bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md shadow-lg overflow-hidden animate-fadeIn">
+    <div className="fixed left-4 top-28 z-40 flex flex-col w-[320px] sm:w-[360px] bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md shadow-2xl overflow-hidden animate-fadeIn">
       
       {/* Header */}
       <div className="p-3 bg-m3-surfaceContainerHigh border-b border-m3-outlineVariant flex items-center justify-between">
@@ -95,132 +105,139 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
           <UserCheck className="w-4 h-4 text-amber-400" />
           <span className="text-sm font-bold text-m3-onSurface">Position Inspector</span>
         </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHighest rounded-m3-xs transition-colors"
-          >
-            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </button>
-          <button
-            onClick={onClose}
-            className="p-1 text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHighest rounded-m3-xs transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+        <button
+          onClick={onClose}
+          className="p-1.5 text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHighest rounded-m3-xs transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Hand Display & Position Selector */}
+      <div className="px-3 py-2.5 border-b border-m3-outlineVariant/50 bg-m3-surfaceContainer/50">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-lg font-black font-mono text-amber-400 bg-m3-surfaceContainerHigh px-2.5 py-1 rounded-m3-xs border border-m3-outline">
+            {handNotation}
+          </span>
+          <span className="text-xs text-m3-onSurfaceVariant font-medium">
+            RFI Strategy
+          </span>
+        </div>
+
+        {/* Position Buttons */}
+        <div className="flex flex-wrap gap-1.5">
+          {positions.map((pos) => {
+            const freq = currentRanges[handNotation] || { raise: 0, call: 0, fold: 1 };
+            const r = Math.round((freq.raise || 0) * 100);
+            const isCurrentHero = pos === currentHeroPosition;
+            const isSelected = pos === selectedPosition;
+
+            return (
+              <button
+                key={pos}
+                onClick={() => handlePositionSelect(pos)}
+                className={`px-2 py-1 text-xs font-bold rounded-m3-xs transition-all border ${isSelected
+                  ? 'bg-amber-500 text-zinc-950 border-amber-400 shadow-sm'
+                  : isCurrentHero
+                    ? 'bg-amber-950/60 text-amber-300 border-amber-500/50 hover:bg-amber-900/60'
+                    : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700'
+                }`}
+              >
+                {pos}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {isExpanded && (
-        <>
-          {/* Hand Display */}
-          <div className="px-3 py-2 border-b border-m3-outlineVariant/50 bg-m3-surfaceContainer/50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-black font-mono text-amber-400 bg-m3-surfaceContainerHigh px-2.5 py-1 rounded-m3-xs border border-m3-outline">
-                  {handNotation}
-                </span>
-                <span className="text-xs text-m3-onSurfaceVariant font-medium">
-                  RFI Strategy
-                </span>
-              </div>
-            </div>
+      {/* Position Info */}
+      <div className="px-3 py-2 border-b border-m3-outlineVariant/50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-extrabold text-amber-400 font-mono">{selectedPosition}</span>
+            <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-m3-xs border uppercase tracking-wider ${structureMeta.badgeBg} ${structureMeta.textColor} ${structureMeta.borderColor}`}>
+              {structureMeta.label}
+            </span>
           </div>
+          <span className="text-[10px] text-zinc-500 font-medium">
+            {currentMath?.playersBehind} players behind
+          </span>
+        </div>
+        <p className="text-[11px] text-zinc-400 font-medium mt-1 leading-snug">
+          {currentDescription}
+        </p>
+      </div>
 
-          {/* Position Buttons */}
-          <div className="px-3 py-2 border-b border-m3-outlineVariant/50">
-            <div className="flex flex-wrap gap-1.5">
-              {positions.map((pos) => {
-                const freq = getRangeForPosition(pos);
-                const r = Math.round((freq.raise || 0) * 100);
-                const isCurrentHero = pos === currentHeroPosition;
-                const isSelected = pos === selectedPosition;
+      {/* 13x13 Grid Matrix - Same layout as RangeGrid */}
+      <div className="p-3 flex-1 overflow-auto">
+        <div className="w-full bg-zinc-950 p-1.5 sm:p-2 rounded-m3-md border border-m3-outlineVariant shadow-inner overflow-hidden">
+          <div className="grid grid-cols-13 gap-0.5">
+            {RANKS.map((r1, rowIndex) =>
+              RANKS.map((r2, colIndex) => {
+                const notation = getMatrixHandNotation(rowIndex, colIndex);
+                const freq = currentRanges[notation];
+                const isCurrentHand = handNotation === notation;
+                const bgStyle = getCellBgStyle(freq);
 
                 return (
                   <button
-                    key={pos}
-                    onClick={() => handlePositionClick(pos)}
-                    className={`px-2 py-1 text-xs font-bold rounded-m3-xs transition-all border ${isSelected
-                      ? 'bg-amber-500 text-zinc-950 border-amber-400 shadow-sm'
-                      : isCurrentHero
-                        ? 'bg-amber-950/60 text-amber-300 border-amber-500/50'
-                        : r > 50
-                          ? 'bg-red-950/60 text-red-300 border-red-500/40 hover:bg-red-900/60'
-                          : r > 0
-                            ? 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700'
-                            : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:bg-zinc-800'
-                    }`}
+                    key={notation}
+                    style={bgStyle}
+                    className={`aspect-square flex items-center justify-center rounded-m3-xs text-[8px] sm:text-[9px] font-bold text-white transition-all transform hover:scale-110 hover:z-30 hover:shadow-lg focus:outline-none relative overflow-hidden ${isCurrentHand ? 'ring-2 ring-amber-400 ring-offset-0.5 ring-offset-black scale-110 z-20 font-black' : ''}`}
+                    title={`${notation}: Raise ${Math.round((freq?.raise || 0) * 100)}%, Call ${Math.round((freq?.call || 0) * 100)}%, Fold ${Math.round((freq?.fold || 0) * 100)}%`}
                   >
-                    {pos}
+                    <span className="drop-shadow-sm font-mono tracking-tighter">{notation}</span>
+                    {isCurrentHand && (
+                      <span className="absolute inset-0 border border-amber-400 animate-pulse rounded-m3-xs pointer-events-none" />
+                    )}
                   </button>
                 );
-              })}
-            </div>
+              })
+            )}
           </div>
+        </div>
 
-          {/* 13x13 Mini Grid */}
-          {selectedPosition && currentRange && (
-            <div className="p-3 flex-1 overflow-auto">
-              <div className="text-xs font-bold text-m3-onSurfaceVariant mb-2">
-                {selectedPosition} RFI Range
-                <span className="ml-2 text-[10px] text-zinc-500 font-normal">
-                  ({currentMath?.playersBehind} behind)
-                </span>
-              </div>
+        {/* Legend */}
+        <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] font-semibold text-m3-onSurfaceVariant mt-2.5">
+          <div className="flex items-center gap-1">
+            <div className="w-2.5 h-2.5 bg-red-600 rounded-sm border border-red-400" />
+            <span>Raise</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-2.5 h-2.5 bg-emerald-600 rounded-sm border border-emerald-400" />
+            <span>Call</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-2.5 h-2.5 bg-zinc-800 rounded-sm border border-zinc-700" />
+            <span>Fold</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-2.5 h-2.5 bg-gradient-to-r from-red-600 to-emerald-600 rounded-sm" />
+            <span>Mixed</span>
+          </div>
+        </div>
+      </div>
 
-              {/* Mini 13x13 Grid */}
-              <div className="grid grid-cols-13 gap-[1px] bg-zinc-800 p-1 rounded-m3-xs">
-                {RANKS.map((r1, rowIndex) =>
-                  RANKS.map((r2, colIndex) => {
-                    const notation = getMatrixHandNotation(rowIndex, colIndex);
-                    const freq = getRangeForPosition(selectedPosition);
-                    const isCurrentHand = handNotation === notation;
-                    const bgStyle = getCellBgStyle(freq);
-
-                    return (
-                      <div
-                        key={notation}
-                        style={bgStyle}
-                        className={`aspect-square flex items-center justify-center text-[7px] font-bold text-white relative overflow-hidden ${isCurrentHand ? 'ring-1 ring-amber-400 ring-offset-0 ring-offset-black' : ''}`}
-                        title={`${notation}: Raise ${Math.round((freq?.raise || 0) * 100)}%`}
-                      >
-                        {isCurrentHand && (
-                          <span className="absolute inset-0 bg-amber-400/20 animate-pulse" />
-                        )}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              {/* Legend */}
-              <div className="flex flex-wrap gap-2 mt-2 text-[9px] text-m3-onSurfaceVariant">
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-red-600 rounded-sm" />
-                  <span>Raise</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-emerald-600 rounded-sm" />
-                  <span>Call</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 bg-zinc-800 rounded-sm border border-zinc-700" />
-                  <span>Fold</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {!selectedPosition && (
-            <div className="p-4 text-center text-xs text-m3-onSurfaceVariant">
-              <p>Click a position above to see its full RFI range.</p>
-              <p className="mt-1 text-[10px] text-zinc-500">
-                The highlighted cell shows where {handNotation} falls in the range.
-              </p>
-            </div>
-          )}
-        </>
-      )}
+      {/* Navigation Footer */}
+      <div className="px-3 py-2 bg-m3-surfaceContainerHigh border-t border-m3-outlineVariant flex items-center justify-between">
+        <button
+          onClick={handlePrev}
+          disabled={currentIndex === 0}
+          className={`p-1.5 rounded-m3-xs transition-colors ${currentIndex === 0 ? 'text-zinc-600 cursor-not-allowed' : 'text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHighest'}`}
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <span className="text-xs text-zinc-500 font-medium">
+          {currentIndex + 1} / {positions.length}
+        </span>
+        <button
+          onClick={handleNext}
+          disabled={currentIndex === positions.length - 1}
+          className={`p-1.5 rounded-m3-xs transition-colors ${currentIndex === positions.length - 1 ? 'text-zinc-600 cursor-not-allowed' : 'text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceContainerHighest'}`}
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   );
 };

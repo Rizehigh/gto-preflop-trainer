@@ -2,6 +2,29 @@ import { ActionFrequencies, SpotDefinition } from '../types/poker';
 import { getAll169Hands, getRankValue } from '../utils/pokerUtils';
 
 /**
+ * SOLVER METHODOLOGY & GTO FREQUENCY ENGINE
+ * 
+ * Solver Parameters & Baseline Configuration:
+ * - Stack Depth: 100 Big Blinds (100BB Effective).
+ * - Rake Structure: 500NL / 1000NL High-Stakes Rake (5% rake, 0.6bb cap; no rake preflop).
+ * - Sizing Standard:
+ *     • Open Raise: 2.5bb (BTN / SB 2.5–3.0bb)
+ *     • 3-Bet IP: 7.5bb (3x open)
+ *     • 3-Bet OOP: 9.5–10.0bb (3.8–4x open)
+ *     • 4-Bet IP: 19.5bb | 4-Bet OOP: 22.5bb
+ * 
+ * Mathematical Frequency Allocation:
+ * - Each hand class maps to an ActionFrequencies object: { raise: r, call: c, fold: f } where r + c + f = 1.0.
+ * - Total combos for a hand notation:
+ *     • Pair = 6 combos (e.g. AA, KK)
+ *     • Suited = 4 combos (e.g. AKs)
+ *     • Offsuit = 12 combos (e.g. AKo)
+ * - Total Range Combo Weighted Sum:
+ *     Combos Open = ∑ [ (r_i x combo_count_i) ] for i in 1..169
+ * - Range Frequency % = (Combos Open / 1,326) x 100%
+ */
+
+/**
  * Helper to construct frequency map for 169 hands
  */
 function buildRange(

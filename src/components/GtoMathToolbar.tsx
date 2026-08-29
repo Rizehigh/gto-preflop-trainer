@@ -16,6 +16,35 @@ export const GtoMathToolbar: React.FC<GtoMathToolbarProps> = ({ spot, handNotati
   const isFacingOpen = spot.category === 'facing_open';
   const isFacing3Bet = spot.category === 'facing_3bet' || spot.category === 'multiway_squeeze';
 
+  /**
+   * POKER MATHEMATICS DERIVATIONS & FORMULAS:
+   * 
+   * 1. Pot Odds:
+   *    Formula: Pot Odds % = Amount to Call / (Pot before call + Amount to Call)
+   *    - Facing 2.5bb Open Raise: Call 2.5bb into (1.5bb blinds + 2.5bb open + 2.5bb call) = 2.5 / 6.5 = 38.5% required equity.
+   *    - Facing 7.5bb 3-Bet: Call 5.0bb into (1.5bb blinds + 2.5bb open + 7.5bb 3bet + 5.0bb call) = 5.0 / 16.5 = 30.3% required equity.
+   * 
+   * 2. Minimum Defense Frequency (MDF):
+   *    Formula: MDF = Pot / (Pot + Bet) = 1 - [Bet / (Pot + Bet)]
+   *    Represents the minimum percentage of Hero's range that must defend (call or raise)
+   *    to prevent Villain from making an automatic, unexploitable EV+ profit with 0% equity bluffs.
+   *    - Open Raise of 2.5bb into 1.5bb dead pot: Bet / (Pot + Bet) = 2.5 / (1.5 + 2.5) = 62.5% bet ratio.
+   *      MDF = 1 - 0.625 = 37.5% (Blinds combined must defend at least 37.5% of hands vs RFI).
+   *    - Facing 3-Bet of 7.5bb over 2.5bb open: MDF = 2.5 / (2.5 + 7.5) = 25% bet ratio -> MDF = 75% defense requirement.
+   * 
+   * 3. Blocker Removal Power (Combinatoric Reduction):
+   *    - Holding an Ace (e.g. A5s, AJo):
+   *        • Removes 1 Ace from the remaining 51-card deck.
+   *        • Opponent AA combos reduced from C(4,2)=6 to C(3,2)=3 (-50% reduction).
+   *        • Opponent AK combos reduced from 4x4=16 to 3x4=12 (-25% reduction).
+   *        • Holding AK (Ace + King) reduces opponent AK combos from 16 to 3x3=9 (-43.75% reduction).
+   * 
+   * 4. Equity Realization (EqR):
+   *    Formula: EqR = Actual EV / (Raw Hot-Cold Equity x Pot)
+   *    - Suited Connectors / Broadways (>100% EqR): Realize more equity due to nut potential, flush draws, and positional leverage.
+   *    - Offsuit Trash / Weak Offsuit (<85% EqR): Realize less equity due to poor playability, reverse implied odds, and dominations.
+   */
+
   // Math derivations
   let potOddsPct = 'N/A (First Preflop Bettor)';
   let mdfPct = '37.5% Minimum Open Defense';

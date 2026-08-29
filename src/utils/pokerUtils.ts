@@ -39,6 +39,14 @@ export function getRankValue(rank: Rank): number {
   return values[rank];
 }
 
+/**
+ * Converts 13x13 grid cell coordinates into standard 169-hand poker notation.
+ * 
+ * Matrix Structure:
+ * - Diagonal (rowIdx === colIdx): 13 Pocket Pairs (e.g., AA, KK, 22). 6 combos each.
+ * - Upper Right Triangle (rowIdx < colIdx): 78 Suited Hands (e.g., AKs, A5s, 76s). 4 combos each.
+ * - Lower Left Triangle (rowIdx > colIdx): 78 Offsuit Hands (e.g., AKo, ATo, QJo). 12 combos each.
+ */
 export function getMatrixHandNotation(rowIdx: number, colIdx: number): string {
   const r1 = RANKS[rowIdx];
   const r2 = RANKS[colIdx];
@@ -52,6 +60,13 @@ export function getMatrixHandNotation(rowIdx: number, colIdx: number): string {
   }
 }
 
+/**
+ * Returns all 169 strategically unique hand notations in standard matrix order.
+ * Total combinations represented across all 169 hand classes = 1,326 combos:
+ * - 13 Pairs x 6 combos = 78 combos (5.88%)
+ * - 78 Suited classes x 4 combos = 312 combos (23.53%)
+ * - 78 Offsuit classes x 12 combos = 936 combos (70.59%)
+ */
 export function getAll169Hands(): string[] {
   const hands: string[] = [];
   for (let r = 0; r < 13; r++) {
@@ -62,6 +77,12 @@ export function getAll169Hands(): string[] {
   return hands;
 }
 
+/**
+ * Calculates total 2-card hole card combinations for a given hand class notation.
+ * - Pocket Pair (e.g. AA): C(4, 2) = 6 combinations.
+ * - Suited Hand (e.g. AKs): 4 suited combinations (♠♠, ♥♥, ♦♦, ♣♣).
+ * - Offsuit Hand (e.g. AKo): 4 x 3 = 12 unsuited combinations.
+ */
 export function getHandCombosCount(notation: string): number {
   if (notation.length === 2) return 6; // Pair (e.g. AA)
   if (notation.endsWith('s')) return 4; // Suited (e.g. AKs)

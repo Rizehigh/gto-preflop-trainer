@@ -180,7 +180,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const activeOpponentProfile = isExploitMode ? OPPONENT_PROFILES[activeOpponentId] : null;
 
   return (
-    <div className={`w-full mx-auto space-y-5 transition-all duration-500 ${showPositionalGrid ? 'max-w-[1700px]' : 'max-w-7xl'}`}>
+    <div className="w-full max-w-[1800px] mx-auto space-y-5">
       
       {/* Mode & Controls Header */}
       <div className="bg-m3-surfaceContainerLow border border-m3-outline p-4 rounded-m3-md flex flex-wrap items-center justify-between gap-4 shadow-sm">

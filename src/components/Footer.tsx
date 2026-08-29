@@ -3,7 +3,7 @@ import React from 'react';
 export const Footer: React.FC = () => {
   return (
     <footer className="w-full bg-m3-surfaceContainerLow border-t border-m3-outlineVariant/60 py-4 px-4 text-center text-xs text-m3-onSurfaceVariant">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-medium">
+      <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 font-medium">
         <div className="flex items-center gap-2">
           <span className="font-bold text-m3-onSurface">GTO Preflop & Morphology Trainer</span>
           <span>•</span>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ActionType, Card, HandAttempt, Position, SpotDefinition, TableSize } from '../types/poker';
 import { SPOT_DEFINITIONS } from '../data/gtoRanges';
 import { classifyHandType, dealCardsForNotation, evaluateUserAction, formatPositionLabel, getAll169Hands, getMorphologyStructureMeta } from '../utils/pokerUtils';
-import { AMATEUR_PROFILES, AmateurArchetypeId, AmateurExploitResult, evaluateAmateurExploit, getAmateurVillainRange } from '../data/amateurProfiles';
+import { OPPONENT_PROFILES, OpponentArchetypeId, ExploitResult, evaluateExploitativeAction, getOpponentVillainRange } from '../data/opponentProfiles';
 import { sounds } from '../utils/soundEffects';
 import { PokerTable } from './PokerTable';
 import { PlayingCard } from './PlayingCard';
@@ -32,10 +32,10 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
   const [isCallHovered, setIsCallHovered] = useState<boolean>(false);
   const [showRangeMatrix, setShowRangeMatrix] = useState<boolean>(false);
 
-  // Amateur Mode States
-  const [isAmateurMode, setIsAmateurMode] = useState<boolean>(false);
-  const [selectedArchetype, setSelectedArchetype] = useState<AmateurArchetypeId | 'random'>('random');
-  const [activeArchetypeId, setActiveArchetypeId] = useState<AmateurArchetypeId>('maniac');
+  // Exploitative Mode States
+  const [isExploitMode, setIsExploitMode] = useState<boolean>(false);
+  const [selectedOpponent, setSelectedOpponent] = useState<OpponentArchetypeId | 'random'>('random');
+  const [activeOpponentId, setActiveOpponentId] = useState<OpponentArchetypeId>('maniac');
 
   const [evaluation, setEvaluation] = useState<{
     isCorrect: boolean;
@@ -44,7 +44,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
     message: string;
   } | null>(null);
 
-  const [amateurExploitResult, setAmateurExploitResult] = useState<AmateurExploitResult | null>(null);
+  const [exploitResult, setExploitResult] = useState<ExploitResult | null>(null);
 
   const generateNewHand = useCallback(() => {
     let availableSpots = SPOT_DEFINITIONS;
@@ -68,24 +68,24 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
     const cards = dealCardsForNotation(randomNotation);
     setDealtCards(cards);
 
-    // Set Amateur Archetype for this hand
-    if (selectedArchetype === 'random') {
-      const archetypes: AmateurArchetypeId[] = ['maniac', 'calling_station', 'nit', 'wild'];
+    // Set Opponent Archetype for this hand
+    if (selectedOpponent === 'random') {
+      const archetypes: OpponentArchetypeId[] = ['maniac', 'calling_station', 'nit', 'wild'];
       const chosen = archetypes[Math.floor(Math.random() * archetypes.length)];
-      setActiveArchetypeId(chosen);
+      setActiveOpponentId(chosen);
     } else {
-      setActiveArchetypeId(selectedArchetype);
+      setActiveOpponentId(selectedOpponent);
     }
 
     setUserAction(null);
     setEvaluation(null);
-    setAmateurExploitResult(null);
+    setExploitResult(null);
     setShowHint(false);
     setShowCallDisabledInfo(false);
     setIsCallHovered(false);
 
     sounds.playCardDeal();
-  }, [selectedSpotId, selectedCategory, leakPosition, selectedArchetype]);
+  }, [selectedSpotId, selectedCategory, leakPosition, selectedOpponent]);
 
   useEffect(() => {
     generateNewHand();
@@ -97,17 +97,17 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
     const freq = currentSpot.ranges[handNotation] || { fold: 1, call: 0, raise: 0 };
     
     let evalResult;
-    let exploitRes: AmateurExploitResult | null = null;
+    let exploitRes: ExploitResult | null = null;
 
-    if (isAmateurMode) {
-      exploitRes = evaluateAmateurExploit(action, handNotation, currentSpot, activeArchetypeId);
+    if (isExploitMode) {
+      exploitRes = evaluateExploitativeAction(action, handNotation, currentSpot, activeOpponentId);
       evalResult = {
         isCorrect: exploitRes.isCorrect,
         isMixed: false,
         optimalAction: exploitRes.optimalExploitAction,
         message: exploitRes.message
       };
-      setAmateurExploitResult(exploitRes);
+      setExploitResult(exploitRes);
     } else {
       evalResult = evaluateUserAction(action, freq);
     }
@@ -136,8 +136,8 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
       optimalAction: evalResult.optimalAction,
       isCorrect: evalResult.isCorrect,
       frequencies: freq,
-      isAmateurMode,
-      amateurArchetype: isAmateurMode ? activeArchetypeId : undefined
+      isExploitMode,
+      opponentArchetype: isExploitMode ? activeOpponentId : undefined
     };
 
     onRecordAttempt(attempt);
@@ -175,7 +175,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
 
   const freq = currentSpot.ranges[handNotation] || { fold: 1, call: 0, raise: 0 };
   const morphologyMeta = getMorphologyStructureMeta(currentSpot.morphologyStructure);
-  const activeAmateurProfile = isAmateurMode ? AMATEUR_PROFILES[activeArchetypeId] : null;
+  const activeOpponentProfile = isExploitMode ? OPPONENT_PROFILES[activeOpponentId] : null;
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-5">
@@ -187,9 +187,9 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
           {/* Mode Switcher */}
           <div className="flex items-center gap-1 bg-m3-surfaceContainer p-1 rounded-m3-xs border border-m3-outlineVariant">
             <button
-              onClick={() => setIsAmateurMode(false)}
+              onClick={() => setIsExploitMode(false)}
               className={`px-3 py-1 text-xs font-extrabold rounded-m3-xs transition-all flex items-center gap-1.5 ${
-                !isAmateurMode
+                !isExploitMode
                   ? 'bg-m3-primary text-m3-onPrimary shadow-sm'
                   : 'text-m3-onSurfaceVariant hover:text-m3-onSurface'
               }`}
@@ -199,15 +199,15 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             </button>
 
             <button
-              onClick={() => setIsAmateurMode(true)}
+              onClick={() => setIsExploitMode(true)}
               className={`px-3 py-1 text-xs font-extrabold rounded-m3-xs transition-all flex items-center gap-1.5 ${
-                isAmateurMode
+                isExploitMode
                   ? 'bg-amber-500 text-zinc-950 shadow-sm'
                   : 'text-m3-onSurfaceVariant hover:text-m3-onSurface hover:bg-m3-surfaceBright'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>Amateur Exploitative Mode</span>
+              <span>Exploitative Mode</span>
             </button>
           </div>
 
@@ -240,16 +240,16 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             <option value="facing_3bet">Facing 3-Bet</option>
           </select>
 
-          {/* Amateur Archetype Selector (when in Amateur Mode) */}
-          {isAmateurMode && (
+          {/* Opponent Archetype Selector (when in Exploitative Mode) */}
+          {isExploitMode && (
             <div className="flex items-center gap-1.5 bg-amber-950/60 border border-amber-500/60 px-2.5 py-1 rounded-m3-xs">
               <span className="text-[11px] font-bold text-amber-300">Opponent:</span>
               <select
-                value={selectedArchetype}
-                onChange={(e) => setSelectedArchetype(e.target.value as any)}
+                value={selectedOpponent}
+                onChange={(e) => setSelectedOpponent(e.target.value as any)}
                 className="bg-zinc-900 text-amber-200 border border-amber-600/50 rounded text-xs font-bold px-2 py-0.5 focus:outline-none"
               >
-                <option value="random">🎲 Random Amateur</option>
+                <option value="random">🎲 Random Opponent</option>
                 <option value="maniac">💣 Maniac (Super Aggressive)</option>
                 <option value="calling_station">🦥 Calling Station (Passive)</option>
                 <option value="nit">🐢 Ultra Tight Nit</option>
@@ -290,22 +290,22 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
         </div>
       </div>
 
-      {/* Amateur Mode Banner (when active) */}
-      {isAmateurMode && activeAmateurProfile && (
-        <div className={`p-4 rounded-m3-md border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow ${activeAmateurProfile.bgColor} ${activeAmateurProfile.borderColor}`}>
+      {/* Exploitative Mode Banner (when active) */}
+      {isExploitMode && activeOpponentProfile && (
+        <div className={`p-4 rounded-m3-md border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow ${activeOpponentProfile.bgColor} ${activeOpponentProfile.borderColor}`}>
           <div className="flex items-center gap-3">
             <div className="text-3xl p-2 bg-zinc-900/80 border border-zinc-700 rounded-m3-xs shadow-inner">
-              {activeAmateurProfile.avatar}
+              {activeOpponentProfile.avatar}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-black text-white">{activeAmateurProfile.name}</span>
-                <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${activeAmateurProfile.badgeColor}`}>
-                  {activeAmateurProfile.shortName}
+                <span className="text-sm font-black text-white">{activeOpponentProfile.name}</span>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${activeOpponentProfile.badgeColor}`}>
+                  {activeOpponentProfile.shortName}
                 </span>
               </div>
               <p className="text-xs text-zinc-200 font-medium mt-0.5">
-                {activeAmateurProfile.tagline}
+                {activeOpponentProfile.tagline}
               </p>
             </div>
           </div>
@@ -316,7 +316,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               <span>Exploit Focus:</span>
             </div>
             <p className="text-zinc-200 font-medium text-[11px] leading-tight">
-              {activeAmateurProfile.exploitSummary}
+              {activeOpponentProfile.exploitSummary}
             </p>
           </div>
         </div>
@@ -336,7 +336,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
             tableSize={tableSize}
             onTableSizeChange={setTableSize}
             onSelectSeat={() => setShowPositionalMatrix(true)}
-            amateurProfile={activeAmateurProfile}
+            opponentProfile={activeOpponentProfile}
           />
 
           <div className="my-2 flex items-center justify-center gap-4">
@@ -368,7 +368,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
           {/* Action Buttons & GTO Math Toolbar */}
           <div className="w-full max-w-xl md:max-w-2xl lg:max-w-3xl space-y-3">
             <div className="text-base font-bold text-m3-onSurfaceVariant text-center uppercase tracking-wider mb-2">
-              {isAmateurMode ? 'Select Optimal Exploitative Play' : 'Select Optimal GTO Play'}
+              {isExploitMode ? 'Select Optimal Exploitative Play' : 'Select Optimal GTO Play'}
             </div>
 
             <div className="grid grid-cols-3 gap-3">
@@ -499,7 +499,7 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               
               <div>
                 <h3 className="text-base font-bold text-m3-onSurface">
-                  {isAmateurMode ? 'Amateur Exploit Matrix Locked' : 'GTO Solution Matrix Locked'}
+                  {isExploitMode ? 'Exploit Mode Matrix Locked' : 'GTO Solution Matrix Locked'}
                 </h3>
                 <p className="text-sm text-m3-onSurfaceVariant font-medium mt-1 max-w-sm mx-auto leading-relaxed">
                   Make your decision or press <strong className="text-amber-400 font-mono">H</strong> for a hint.
@@ -516,16 +516,16 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                 </button>
               </div>
 
-              {isAmateurMode && activeAmateurProfile && (
+              {isExploitMode && activeOpponentProfile && (
                 <div className="bg-amber-950/40 p-3.5 rounded-m3-xs border border-amber-500/40 text-left space-y-1.5">
                   <div className="text-sm font-bold text-amber-300 flex items-center gap-1.5 uppercase">
                     <Zap className="w-3.5 h-3.5 text-amber-400" />
                     <span>Targeting Opponent Tendency:</span>
                   </div>
                   <ul className="text-sm text-zinc-300 space-y-1 font-medium list-disc list-inside">
-                    <li><strong>RFI:</strong> {activeAmateurProfile.tendencies.rfiTendency}</li>
-                    <li><strong>Facing Open:</strong> {activeAmateurProfile.tendencies.facingOpenTendency}</li>
-                    <li><strong>Facing 3-Bet:</strong> {activeAmateurProfile.tendencies.facing3betTendency}</li>
+                    <li><strong>RFI:</strong> {activeOpponentProfile.tendencies.rfiTendency}</li>
+                    <li><strong>Facing Open:</strong> {activeOpponentProfile.tendencies.facingOpenTendency}</li>
+                    <li><strong>Facing 3-Bet:</strong> {activeOpponentProfile.tendencies.facing3betTendency}</li>
                   </ul>
                 </div>
               )}
@@ -545,32 +545,66 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                   frequencies={freq}
                   spotName={currentSpot.name}
                   onNext={generateNewHand}
-                  amateurProfile={activeAmateurProfile}
-                  amateurExploit={amateurExploitResult}
+                  opponentProfile={activeOpponentProfile}
+                  exploitResult={exploitResult}
                 />
               )}
 
-              <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow overflow-hidden space-y-3">
-                <div className={`p-3 rounded-m3-xs border flex flex-col gap-1 ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm uppercase font-extrabold tracking-wider text-m3-onSurface">
-                      Spot Range Morphology
+              {/* HERO GTO RANGE MATRIX */}
+              <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm uppercase font-extrabold tracking-wider text-amber-400 font-mono">
+                      HERO RANGE ({currentSpot.heroPosition}):
                     </span>
-                    <span className={`px-2.5 py-0.5 font-black text-xs uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.borderColor}`}>
+                    <span className={`px-2 py-0.5 font-black text-xs uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
                       {morphologyMeta.label}
                     </span>
                   </div>
-                  <p className="text-sm font-semibold text-zinc-300 leading-snug mt-0.5">
-                    {currentSpot.morphologyDescription}
-                  </p>
                 </div>
 
-                <RangeGrid
-                  spot={currentSpot}
-                  highlightHand={handNotation}
-                  title={`GTO Matrix: ${currentSpot.name}`}
-                  showLegend
-                />
+                <p className="text-sm font-medium text-m3-onSurfaceVariant leading-snug">
+                  {currentSpot.morphologyDescription}
+                </p>
+
+                <div className="pt-2 border-t border-m3-outlineVariant">
+                  <RangeGrid
+                    spot={currentSpot}
+                    highlightHand={handNotation}
+                    overrideTarget="hero"
+                    title={`Hero GTO Matrix (${currentSpot.heroPosition})`}
+                    showLegend
+                  />
+                </div>
+              </div>
+
+              {/* VILLAIN GTO RANGE MATRIX */}
+              <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm uppercase font-extrabold tracking-wider text-red-400 font-mono">
+                      VILLAIN RANGE ({currentSpot.villainPosition || 'OPENER'}):
+                    </span>
+                    {currentSpot.villainMorphologyStructure && (
+                      <span className="px-2 py-0.5 font-black text-xs uppercase tracking-wide border rounded-m3-xs bg-red-950/80 text-red-300 border-red-500">
+                        {currentSpot.villainMorphologyStructure}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <p className="text-sm font-medium text-m3-onSurfaceVariant leading-snug">
+                  {currentSpot.villainMorphologyDescription || `Preflop opening / raising range structure for ${currentSpot.villainPosition || 'Villain'}.`}
+                </p>
+
+                <div className="pt-2 border-t border-m3-outlineVariant">
+                  <RangeGrid
+                    spot={currentSpot}
+                    overrideTarget="villain"
+                    title={`Villain GTO Matrix (${currentSpot.villainPosition || 'Opener'})`}
+                    showLegend
+                  />
+                </div>
               </div>
             </>
           )}

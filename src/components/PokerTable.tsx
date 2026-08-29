@@ -1,6 +1,6 @@
 import React from 'react';
 import { Position, TableSize } from '../types/poker';
-import { AmateurProfile } from '../data/amateurProfiles';
+import { OpponentProfile } from '../data/opponentProfiles';
 import { calculateEllipseSeatCoordinates, calculatePositionMathMetrics, getPositionsForTableSize } from '../utils/gtoMath';
 
 interface PokerTableProps {
@@ -12,7 +12,7 @@ interface PokerTableProps {
   onTableSizeChange?: (size: TableSize) => void;
   onSelectSeat?: (position: Position) => void;
   compact?: boolean;
-  amateurProfile?: AmateurProfile | null;
+  opponentProfile?: OpponentProfile | null;
 }
 
 export const PokerTable: React.FC<PokerTableProps> = ({
@@ -24,7 +24,7 @@ export const PokerTable: React.FC<PokerTableProps> = ({
   onTableSizeChange,
   onSelectSeat,
   compact = false,
-  amateurProfile
+  opponentProfile
 }) => {
   const positions = getPositionsForTableSize(tableSize);
   const seatCoords = calculateEllipseSeatCoordinates(tableSize);
@@ -116,8 +116,8 @@ export const PokerTable: React.FC<PokerTableProps> = ({
                   </span>
                 )}
                 {isVillain && (
-                  <span className={`text-[11px] px-1.5 rounded-m3-xs uppercase font-extrabold ${amateurProfile ? amateurProfile.badgeColor : 'bg-red-600 text-white'}`}>
-                    {amateurProfile ? `${amateurProfile.avatar} ${amateurProfile.shortName}` : 'Villain'}
+                  <span className={`text-[11px] px-1.5 rounded-m3-xs uppercase font-extrabold ${opponentProfile ? opponentProfile.badgeColor : 'bg-red-600 text-white'}`}>
+                    {opponentProfile ? `${opponentProfile.avatar} ${opponentProfile.shortName}` : 'Villain'}
                   </span>
                 )}
               </button>

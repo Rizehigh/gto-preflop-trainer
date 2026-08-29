@@ -1,10 +1,10 @@
-import { ActionFrequencies, ActionType, Position, RangeMorphologyStructure, SpotDefinition } from '../types/poker';
+import { ActionFrequencies, ActionType, SpotDefinition } from '../types/poker';
 import { getAll169Hands, getRankValue } from '../utils/pokerUtils';
 
-export type AmateurArchetypeId = 'maniac' | 'calling_station' | 'nit' | 'wild';
+export type OpponentArchetypeId = 'maniac' | 'calling_station' | 'nit' | 'wild';
 
-export interface AmateurProfile {
-  id: AmateurArchetypeId;
+export interface OpponentProfile {
+  id: OpponentArchetypeId;
   name: string;
   shortName: string;
   avatar: string; // Emoji or icon name
@@ -22,7 +22,7 @@ export interface AmateurProfile {
   exploitSummary: string;
 }
 
-export const AMATEUR_PROFILES: Record<AmateurArchetypeId, AmateurProfile> = {
+export const OPPONENT_PROFILES: Record<OpponentArchetypeId, OpponentProfile> = {
   maniac: {
     id: 'maniac',
     name: 'Super Aggressive Maniac',
@@ -79,7 +79,7 @@ export const AMATEUR_PROFILES: Record<AmateurArchetypeId, AmateurProfile> = {
   },
   wild: {
     id: 'wild',
-    name: 'Wild / Unpredictable Amateur',
+    name: 'Wild / Unpredictable',
     shortName: 'Wild',
     avatar: '🎲',
     badgeColor: 'bg-purple-600 text-white',
@@ -98,15 +98,15 @@ export const AMATEUR_PROFILES: Record<AmateurArchetypeId, AmateurProfile> = {
 };
 
 /**
- * Generate distorted amateur villain range for a given spot and archetype
+ * Generate distorted opponent villain range for a given spot and archetype
  */
-export function getAmateurVillainRange(
+export function getOpponentVillainRange(
   spot: SpotDefinition,
-  archetypeId: AmateurArchetypeId
+  archetypeId: OpponentArchetypeId
 ): Record<string, ActionFrequencies> {
   const baseRange = spot.villainRange || spot.ranges;
   const allHands = getAll169Hands();
-  const amateurRange: Record<string, ActionFrequencies> = {};
+  const opponentRange: Record<string, ActionFrequencies> = {};
 
   for (const hand of allHands) {
     const base = baseRange[hand] || { fold: 1, call: 0, raise: 0 };
@@ -124,7 +124,6 @@ export function getAmateurVillainRange(
     let f = base.fold;
 
     if (archetypeId === 'maniac') {
-      // Maniac raises and 3-bets aggressively with trash, aces, suited hands
       if (spot.category === 'rfi' || spot.category === 'facing_open') {
         if (isHighAce || isBroadway || isSuited || isPair || v1 >= 8) {
           r = Math.min(1.0, r + 0.5);
@@ -139,14 +138,12 @@ export function getAmateurVillainRange(
         }
       }
     } else if (archetypeId === 'calling_station') {
-      // Calling station almost never raises/3bets unless premium, but calls heavily
       const isSuperPremium = (hand === 'AA' || hand === 'KK' || hand === 'AKs');
       if (spot.category === 'facing_open' || spot.category === 'facing_3bet') {
         if (isSuperPremium) {
           r = 1.0;
           c = 0;
         } else {
-          // Convert raise frequency into calling frequency, and call wide
           const callBoost = (isSuited || isPair || isBroadway || v1 >= 9) ? 0.6 : 0.3;
           c = Math.min(1.0, c + r + callBoost);
           r = 0;
@@ -158,7 +155,6 @@ export function getAmateurVillainRange(
         }
       }
     } else if (archetypeId === 'nit') {
-      // Nit folds everything except top ~5% hands
       const isPremium = (isPair && v1 >= 10) || (isHighAce && v2 >= 12); // TT+, AK, AQ
       if (!isPremium) {
         r = 0;
@@ -167,7 +163,6 @@ export function getAmateurVillainRange(
         r = Math.min(1.0, r + 0.2);
       }
     } else if (archetypeId === 'wild') {
-      // Wild player overvalues suited hands and aces randomly
       if (isSuited || isHighAce) {
         if (spot.allowedActions.includes('call') && Math.random() > 0.5) {
           c = Math.min(1.0, c + 0.4);
@@ -179,7 +174,6 @@ export function getAmateurVillainRange(
       }
     }
 
-    // Normalize frequencies
     const total = r + c;
     if (total > 1.0) {
       r = Math.round((r / total) * 100) / 100;
@@ -191,13 +185,13 @@ export function getAmateurVillainRange(
       f = Math.round(Math.max(0, 1.0 - r - c) * 100) / 100;
     }
 
-    amateurRange[hand] = { raise: r, call: c, fold: f };
+    opponentRange[hand] = { raise: r, call: c, fold: f };
   }
 
-  return amateurRange;
+  return opponentRange;
 }
 
-export interface AmateurExploitResult {
+export interface ExploitResult {
   isCorrect: boolean;
   optimalExploitAction: ActionType;
   gtoOptimalAction: ActionType;
@@ -207,18 +201,17 @@ export interface AmateurExploitResult {
 }
 
 /**
- * Evaluate user action against an Amateur archetype in a given spot
+ * Evaluate user action against an opponent archetype in a given spot
  */
-export function evaluateAmateurExploit(
+export function evaluateExploitativeAction(
   userAction: ActionType,
   handNotation: string,
   spot: SpotDefinition,
-  archetypeId: AmateurArchetypeId
-): AmateurExploitResult {
-  const profile = AMATEUR_PROFILES[archetypeId];
+  archetypeId: OpponentArchetypeId
+): ExploitResult {
+  const profile = OPPONENT_PROFILES[archetypeId];
   const gtoFreq = spot.ranges[handNotation] || { fold: 1, call: 0, raise: 0 };
   
-  // Find GTO optimal
   let gtoOptimal: ActionType = 'fold';
   if (gtoFreq.raise >= gtoFreq.call && gtoFreq.raise >= gtoFreq.fold) gtoOptimal = 'raise';
   else if (gtoFreq.call >= gtoFreq.raise && gtoFreq.call >= gtoFreq.fold) gtoOptimal = 'call';
@@ -237,11 +230,7 @@ export function evaluateAmateurExploit(
   let evDifferenceNote = '';
 
   if (archetypeId === 'maniac') {
-    // Against Maniac:
-    // - Bluffs (pure light 3-bets / 4-bets with weak trash) lose heavily because Maniac never folds.
-    // - Value hands (strong broadways, pairs, AJ+) should call/raise for pure value.
     if (gtoOptimal === 'raise' && (gtoFreq.raise < 0.7) && !isBroadway && !isPair && !isHighAce) {
-      // GTO light bluff raise -> Exploit is FOLD or CALL
       optimalExploit = spot.allowedActions.includes('call') ? 'call' : 'fold';
       exploitReasoning = `Against a ${profile.name}, light bluffs have negative EV because they fold far less than GTO. Shift bluffs into value calls or folds.`;
       evDifferenceNote = 'GTO raises light here as a bluff, but against a Maniac who calls/raises constantly, pure bluffs torch money.';
@@ -251,9 +240,6 @@ export function evaluateAmateurExploit(
       evDifferenceNote = `Calling or raising with ${handNotation} captures massive EV against Maniac's over-aggressive range.`;
     }
   } else if (archetypeId === 'calling_station') {
-    // Against Calling Station:
-    // - Pure bluffs lose money because Station calls too much.
-    // - Thin value bets/raises gain massive EV.
     if (gtoOptimal === 'raise' && (gtoFreq.raise < 0.6) && !isBroadway && !isPair && !isHighAce) {
       optimalExploit = spot.allowedActions.includes('call') ? 'call' : 'fold';
       exploitReasoning = `Station never folds! Replace GTO light bluffs with value hands. Do not bluff a Calling Station.`;
@@ -264,9 +250,6 @@ export function evaluateAmateurExploit(
       evDifferenceNote = `Raising ${handNotation} extracts maximum value from Station's wide calling range.`;
     }
   } else if (archetypeId === 'nit') {
-    // Against Nit:
-    // - If Nit opens or 3-bets, fold medium hands (AQ, AJ, JJ, TT face Nit's 3-bet).
-    // - If facing Nit's open, 3-bet bluff heavily or steal blinds!
     if (spot.category === 'facing_3bet' || spot.villainPosition === 'UTG') {
       if (!isPair || v1 < 12) { // Less than QQ
         if (handNotation !== 'AKs' && handNotation !== 'AKo') {
@@ -283,8 +266,6 @@ export function evaluateAmateurExploit(
       }
     }
   } else if (archetypeId === 'wild') {
-    // Against Wild:
-    // Solid linear play, value raise top hands, fold trash.
     if (isPair || isBroadway || isHighAce) {
       optimalExploit = 'raise';
       exploitReasoning = `Against a Wild player, stick to high-card equity and linear value raises.`;

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { HandCategoryType, Position, UserStats } from '../types/poker';
-import { AMATEUR_PROFILES } from '../data/amateurProfiles';
+import { OPPONENT_PROFILES } from '../data/opponentProfiles';
 import { formatHandCategoryLabel, formatPositionLabel } from '../utils/pokerUtils';
 import { BarChart3, AlertTriangle, ShieldCheck, RefreshCw, Flame, Target, ChevronRight, Zap, TrendingUp, Activity, PieChart, Crosshair } from 'lucide-react';
 
@@ -541,9 +541,9 @@ export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({
                   <tr key={attempt.id} className="hover:bg-m3-surfaceContainerHigh">
                     <td className="py-2.5 px-3 text-m3-onSurface">{attempt.spotName}</td>
                     <td className="py-2.5 px-3 text-xs">
-                      {attempt.isAmateurMode && attempt.amateurArchetype && AMATEUR_PROFILES[attempt.amateurArchetype as keyof typeof AMATEUR_PROFILES] ? (
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${AMATEUR_PROFILES[attempt.amateurArchetype as keyof typeof AMATEUR_PROFILES].badgeColor}`}>
-                          {AMATEUR_PROFILES[attempt.amateurArchetype as keyof typeof AMATEUR_PROFILES].avatar} {AMATEUR_PROFILES[attempt.amateurArchetype as keyof typeof AMATEUR_PROFILES].shortName}
+                      {attempt.isExploitMode && attempt.opponentArchetype && OPPONENT_PROFILES[attempt.opponentArchetype as keyof typeof OPPONENT_PROFILES] ? (
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${OPPONENT_PROFILES[attempt.opponentArchetype as keyof typeof OPPONENT_PROFILES].badgeColor}`}>
+                          {OPPONENT_PROFILES[attempt.opponentArchetype as keyof typeof OPPONENT_PROFILES].avatar} {OPPONENT_PROFILES[attempt.opponentArchetype as keyof typeof OPPONENT_PROFILES].shortName}
                         </span>
                       ) : (
                         <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-zinc-800 text-zinc-300 border border-zinc-700">

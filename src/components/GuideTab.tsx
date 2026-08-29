@@ -137,14 +137,14 @@ export const GuideTab: React.FC = () => {
         </div>
       </div>
 
-      {/* Section 4: Amateur Exploitative Strategy */}
+      {/* Section 4: Opponent Exploitative Strategy */}
       <div className="bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-6 shadow-sm space-y-4">
         <h3 className="text-base font-bold text-m3-onSurface flex items-center gap-2">
           <Users className="w-4 h-4 text-amber-400" />
-          <span>4. Amateur Exploitative Play & Opponent Archetypes</span>
+          <span>4. Opponent Exploitative Play & Opponent Archetypes</span>
         </h3>
         <p className="text-xs text-m3-onSurfaceVariant leading-relaxed font-medium">
-          GTO equilibrium assumes opponents play perfectly. When facing amateur opponents who deviate heavily from GTO, maximum EV comes from <strong>exploitative play</strong>—intentionally adjusting your strategy to target their specific leaks.
+          GTO equilibrium assumes opponents play perfectly. When facing real-world opponents who deviate heavily from GTO, maximum EV comes from <strong>exploitative play</strong>—intentionally adjusting your strategy to target their specific leaks.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">

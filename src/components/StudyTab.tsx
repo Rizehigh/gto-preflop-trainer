@@ -3,13 +3,13 @@ import { SPOT_DEFINITIONS } from '../data/gtoRanges';
 import { SpotDefinition } from '../types/poker';
 import { RangeGrid } from './RangeGrid';
 import { getAll169Hands, getHandCombosCount } from '../utils/pokerUtils';
-import { AMATEUR_PROFILES, AmateurArchetypeId, getAmateurVillainRange } from '../data/amateurProfiles';
+import { OPPONENT_PROFILES, OpponentArchetypeId, getOpponentVillainRange } from '../data/opponentProfiles';
 import { Grid, Filter, Users, User, Zap } from 'lucide-react';
 
 export const StudyTab: React.FC = () => {
   const [selectedSpot, setSelectedSpot] = useState<SpotDefinition>(SPOT_DEFINITIONS[0]);
   const [filterAction, setFilterAction] = useState<'all' | 'raise' | 'call' | 'mixed'>('all');
-  const [viewMode, setViewMode] = useState<'hero' | 'villain_gto' | AmateurArchetypeId>('hero');
+  const [viewMode, setViewMode] = useState<'hero' | 'villain_gto' | OpponentArchetypeId>('hero');
 
   // Compute spot definition to pass to RangeGrid based on viewMode
   const getActiveSpotDefinition = (): SpotDefinition => {
@@ -26,14 +26,14 @@ export const StudyTab: React.FC = () => {
       };
     }
 
-    // Amateur archetype
-    const amateurRange = getAmateurVillainRange(selectedSpot, viewMode);
-    const profile = AMATEUR_PROFILES[viewMode];
+    // Opponent archetype
+    const opponentRange = getOpponentVillainRange(selectedSpot, viewMode);
+    const profile = OPPONENT_PROFILES[viewMode];
     return {
       ...selectedSpot,
       name: `${selectedSpot.name} (${profile.avatar} ${profile.shortName} Range)`,
-      ranges: amateurRange,
-      morphologyDescription: `Distorted amateur range for ${profile.name}: ${profile.tagline}`
+      ranges: opponentRange,
+      morphologyDescription: `Exploitative opponent range for ${profile.name}: ${profile.tagline}`
     };
   };
 
@@ -98,7 +98,7 @@ export const StudyTab: React.FC = () => {
           </div>
         </div>
 
-        {/* View Mode Switcher: Hero GTO vs Villain GTO vs Amateur Archetypes */}
+        {/* View Mode Switcher: Hero GTO vs Villain GTO vs Opponent Archetypes */}
         <div className="pt-2 border-t border-m3-outlineVariant flex flex-wrap items-center gap-2">
           <span className="text-xs font-bold text-m3-onSurfaceVariant uppercase tracking-wider flex items-center gap-1">
             <Users className="w-3.5 h-3.5 text-amber-400" />
@@ -131,7 +131,7 @@ export const StudyTab: React.FC = () => {
 
           <div className="h-4 w-px bg-m3-outlineVariant mx-1 hidden sm:block" />
 
-          {/* Amateur Archetypes */}
+          {/* Opponent Archetypes */}
           <button
             onClick={() => setViewMode('maniac')}
             className={`px-2.5 py-1 rounded-m3-xs text-xs font-bold transition-all border ${

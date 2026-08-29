@@ -2,7 +2,7 @@ import React from 'react';
 import { ActionFrequencies, ActionType, Card, HandCategoryType } from '../types/poker';
 import { getMorphologyInsightForHand } from '../data/morphologyData';
 import { getHandCombosCount } from '../utils/pokerUtils';
-import { AmateurProfile, AmateurExploitResult } from '../data/amateurProfiles';
+import { OpponentProfile, ExploitResult } from '../data/opponentProfiles';
 import { CheckCircle2, XCircle, Lightbulb, Shield, Zap, Sparkles, Compass, Target, AlertTriangle } from 'lucide-react';
 
 interface MorphologyExplanationProps {
@@ -16,8 +16,8 @@ interface MorphologyExplanationProps {
   frequencies: ActionFrequencies;
   spotName: string;
   onNext: () => void;
-  amateurProfile?: AmateurProfile | null;
-  amateurExploit?: AmateurExploitResult | null;
+  opponentProfile?: OpponentProfile | null;
+  exploitResult?: ExploitResult | null;
 }
 
 export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
@@ -31,8 +31,8 @@ export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
   frequencies,
   spotName,
   onNext,
-  amateurProfile,
-  amateurExploit
+  opponentProfile,
+  exploitResult
 }) => {
   const insight = getMorphologyInsightForHand(handNotation);
   const combos = getHandCombosCount(handNotation);
@@ -60,9 +60,9 @@ export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
           <div>
             <div className="text-sm uppercase tracking-wider font-extrabold text-white flex items-center gap-1.5">
               <span>{isCorrect ? 'Correct Play' : 'Suboptimal Play'}</span>
-              {amateurProfile && (
-                <span className={`px-1.5 py-0.5 rounded text-sm ${amateurProfile.badgeColor}`}>
-                  {amateurProfile.avatar} vs {amateurProfile.shortName}
+              {opponentProfile && (
+                <span className={`px-1.5 py-0.5 rounded text-sm ${opponentProfile.badgeColor}`}>
+                  {opponentProfile.avatar} vs {opponentProfile.shortName}
                 </span>
               )}
             </div>
@@ -79,22 +79,22 @@ export const MorphologyExplanation: React.FC<MorphologyExplanationProps> = ({
         </button>
       </div>
 
-      {/* Amateur Exploit Card (when in Amateur Mode) */}
-      {amateurProfile && amateurExploit && (
-        <div className={`p-4 rounded-m3-sm border space-y-2 text-sm ${amateurProfile.bgColor} ${amateurProfile.borderColor}`}>
+      {/* Exploitative Strategy Card (when in Exploitative Mode) */}
+      {opponentProfile && exploitResult && (
+        <div className={`p-4 rounded-m3-sm border space-y-2 text-sm ${opponentProfile.bgColor} ${opponentProfile.borderColor}`}>
           <div className="flex items-center justify-between font-bold border-b pb-2 border-white/10">
             <div className="flex items-center gap-2 text-white">
               <Target className="w-4 h-4 text-amber-400" />
-              <span>Exploitative Strategy vs {amateurProfile.name}</span>
+              <span>Exploitative Strategy vs {opponentProfile.name}</span>
             </div>
-            <span className={`px-2 py-0.5 rounded font-extrabold text-sm ${amateurProfile.badgeColor}`}>
-              Optimal Exploit: {amateurExploit.optimalExploitAction.toUpperCase()}
+            <span className={`px-2 py-0.5 rounded font-extrabold text-sm ${opponentProfile.badgeColor}`}>
+              Optimal Exploit: {exploitResult.optimalExploitAction.toUpperCase()}
             </span>
           </div>
 
           <div className="space-y-1.5 font-medium text-zinc-200">
-            <p><strong className="text-amber-300">Exploit Analysis:</strong> {amateurExploit.exploitReasoning}</p>
-            <p><strong className="text-emerald-300">EV Difference:</strong> {amateurExploit.evDifferenceNote}</p>
+            <p><strong className="text-amber-300">Exploit Analysis:</strong> {exploitResult.exploitReasoning}</p>
+            <p><strong className="text-emerald-300">EV Difference:</strong> {exploitResult.evDifferenceNote}</p>
           </div>
         </div>
       )}

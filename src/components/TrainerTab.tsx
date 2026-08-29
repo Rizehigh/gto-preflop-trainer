@@ -550,61 +550,28 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
                 />
               )}
 
-              {/* HERO GTO RANGE MATRIX */}
+              {/* GTO Range Matrix with Hero/Villain Toggle */}
               <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm uppercase font-extrabold tracking-wider text-amber-400 font-mono">
-                      HERO RANGE ({currentSpot.heroPosition}):
+                <div className={`p-3 rounded-m3-xs border flex flex-col gap-1 ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm uppercase font-extrabold tracking-wider text-m3-onSurface">
+                      Spot Range Morphology
                     </span>
-                    <span className={`px-2 py-0.5 font-black text-xs uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.badgeBg} ${morphologyMeta.borderColor}`}>
+                    <span className={`px-2.5 py-0.5 font-black text-xs uppercase tracking-wide border rounded-m3-xs ${morphologyMeta.textColor} ${morphologyMeta.borderColor}`}>
                       {morphologyMeta.label}
                     </span>
                   </div>
+                  <p className="text-sm font-semibold text-zinc-300 leading-snug mt-0.5">
+                    {currentSpot.morphologyDescription}
+                  </p>
                 </div>
 
-                <p className="text-sm font-medium text-m3-onSurfaceVariant leading-snug">
-                  {currentSpot.morphologyDescription}
-                </p>
-
-                <div className="pt-2 border-t border-m3-outlineVariant">
-                  <RangeGrid
-                    spot={currentSpot}
-                    highlightHand={handNotation}
-                    overrideTarget="hero"
-                    title={`Hero GTO Matrix (${currentSpot.heroPosition})`}
-                    showLegend
-                  />
-                </div>
-              </div>
-
-              {/* VILLAIN GTO RANGE MATRIX */}
-              <div className="w-full bg-m3-surfaceContainerLow border border-m3-outline rounded-m3-md p-4 shadow space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm uppercase font-extrabold tracking-wider text-red-400 font-mono">
-                      VILLAIN RANGE ({currentSpot.villainPosition || 'OPENER'}):
-                    </span>
-                    {currentSpot.villainMorphologyStructure && (
-                      <span className="px-2 py-0.5 font-black text-xs uppercase tracking-wide border rounded-m3-xs bg-red-950/80 text-red-300 border-red-500">
-                        {currentSpot.villainMorphologyStructure}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <p className="text-sm font-medium text-m3-onSurfaceVariant leading-snug">
-                  {currentSpot.villainMorphologyDescription || `Preflop opening / raising range structure for ${currentSpot.villainPosition || 'Villain'}.`}
-                </p>
-
-                <div className="pt-2 border-t border-m3-outlineVariant">
-                  <RangeGrid
-                    spot={currentSpot}
-                    overrideTarget="villain"
-                    title={`Villain GTO Matrix (${currentSpot.villainPosition || 'Opener'})`}
-                    showLegend
-                  />
-                </div>
+                <RangeGrid
+                  spot={currentSpot}
+                  highlightHand={handNotation}
+                  title={`GTO Matrix: ${currentSpot.name}`}
+                  showLegend
+                />
               </div>
             </>
           )}

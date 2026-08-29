@@ -81,10 +81,6 @@ export const PositionalRangeGrid: React.FC<PositionalRangeGridProps> = ({
 
   const handlePositionSelect = (pos: Position) => {
     setSelectedPosition(pos);
-    if (onSelectPositionSpot) {
-      const spot = getSpotForPosition(pos);
-      onSelectPositionSpot(spot);
-    }
   };
 
   // Navigate to previous/next position

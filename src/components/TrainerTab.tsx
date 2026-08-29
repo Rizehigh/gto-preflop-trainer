@@ -335,12 +335,6 @@ export const TrainerTab: React.FC<TrainerTabProps> = ({ onRecordAttempt, leakPos
               tableSize={tableSize}
               currentHeroPosition={currentSpot.heroPosition}
               onClose={() => setShowPositionalGrid(false)}
-              onSelectPositionSpot={(spot) => {
-                setCurrentSpot(spot);
-                setUserAction(null);
-                setShowHint(false);
-                setEvaluation(null);
-              }}
             />
           </div>
         )}

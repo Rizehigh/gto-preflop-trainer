@@ -8,64 +8,85 @@
 
 An interactive, high-contrast **Game Theory Optimal (GTO) Preflop Range & Hand Morphology Trainer** supporting **6-Max, 7-Max, 8-Max, 9-Max, and 10-Max Full Ring** tables.
 
-Unlike traditional flashcard tools, this trainer focuses on **Hand Morphology** — teaching players *why* hands are played based on high card domination, suited barrel equity, Ace blockers, board connectivity, positional equity realization, and range structure type (**Linear**, **Polarized**, **Condensed**, **Mixed**).
+Unlike traditional flashcard tools, this trainer focuses on **Hand Morphology** — teaching players *why* hands are played based on high card domination, suited barrel equity, Ace/King blockers, board connectivity, positional equity realization, and range structure type (**Linear**, **Polarized**, **Condensed**, **Mixed**).
 
 ---
 
-## ✨ Features & Capabilities
+## ✨ Key Features & Capabilities
 
-- 🎨 **High-Contrast Obsidian Dark Theme**:
-  - Deep obsidian dark background (`#0d0e11` / `#15171c`) designed for maximum visual clarity.
-  - Vivid action coding: **Warm Gold** (Primary / Highlight), **Crimson Red** (Raise / 3-Bet / 4-Bet), **Emerald Green** (Call / Defend), and **Charcoal Slate** (Fold).
+### 🔍 1. Position Inspector Grid Matrix
+- **In-Flow Attached Inspector**: Open the inspector to view how your dealt hand (e.g. `AKs`, `TT`, `A5s`) is played across **every preflop position** (`UTG` through `BB`).
+- **Decoupled Gameplay**: Navigating seats inside the Position Inspector will **never reset your active hand decision** or hide your open GTO solutions.
+- **Interactive 13x13 RFI Matrix**: Renders full 169-hand preflop matrices per position with exact GTO raise, call, and fold frequencies.
+- **Full Ring GTO Statistics**: Displays GTO RFI %, players remaining behind, premium hand risk %, and range morphology notes.
 
-- 🧮 **Full Ring GTO Mathematics (6-Max to 10-Max)**:
-  - Supports dynamic table sizes (**6-Max, 7-Max, 8-Max, 9-Max, 10-Max**).
-  - Real-time preflop probability metrics:
-    - **Card Removal & Opponent Risk**: P(Premium Behind) = 1 - (1 - 0.048)^N
-    - **Geometric RFI Open Decay**: Exponential RFI decay scaling from BTN (~46%) down to 10-Max UTG (~7.5%).
-  - Dynamic elliptical seat renderer that positions seats clockwise around the felt.
+### 📐 2. Ultra-Wide Responsive Layout (1800px Ceiling)
+- Engineered for standard **1080p** (1920x1080) and **1440p** (2560x1440) monitors.
+- Supports **3 attached side-by-side card panels**:
+  1. *Position Inspector Grid* (Left)
+  2. *Interactive Poker Felt & Action Controls* (Center)
+  3. *GTO Solution Matrix & Explanation Panel* (Right)
+- Smooth CSS layout shifts preserve exact poker table dimensions with zero cutoffs or clipping.
 
-- 🧬 **Range Morphology Structure Classification**:
-  - **Linear Range**: Pure strength opening from early positions without gaps.
-  - **Polarized Range**: 3-bet / 4-bet ranges combining monster premiums + blocker bluffs.
-  - **Condensed Range**: Capped calling ranges (e.g. BB defend) preserving implied odds.
-  - **Mixed Range**: Split-frequency equilibrium plays (e.g., SB RFI vs BB).
+### 🧮 3. GTO Mathematics & Combinatorics Engine
+- **Card Removal & Opponent Risk**: Binomial probability model:
+  $$\text{P(Premium Behind)} = 1 - (1 - 0.048)^n$$
+  calculates the exact likelihood of facing `AA, KK, QQ, JJ, AKs, AKo` among the $n$ players remaining to act.
+- **Pot Odds Requirement**:
+  $$\text{Pot Odds \%} = \frac{\text{Amount to Call}}{\text{Total Pot after Call}} \times 100\%$$
+- **Minimum Defense Frequency (MDF)**:
+  $$\text{MDF \%} = \frac{\text{Pot}}{\text{Pot} + \text{Bet}} \times 100\%$$
+  quantifies the exact percentage of Hero's range required to defend to prevent Villain from profitably auto-bluffing.
+- **Blocker Removal Power**: Calculates Ace/King combinatoric reductions (e.g. holding an Ace reduces opponent AA combinations from 6 to 3 combos, a 50% removal power).
+- **Equity Realization (EqR)**: Evaluates playability bonuses for suited hands (>100% EqR) vs reverse implied odds penalties for weak offsuit hands (<85% EqR).
 
-- 💡 **Pre-Decision Solution Lock & Hint Shortcut (`H` Key)**:
-  - Solution matrix remains locked while considering your move to prevent peeking.
-  - Press <kbd>H</kbd> anytime to toggle a live GTO solution hint grid.
+### 🧬 4. Range Morphology Structure Classification
+- **Linear Range**: Pure strength opening from early positions without gaps.
+- **Polarized Range**: 3-bet / 4-bet ranges combining monster premiums with high-card blocker bluffs.
+- **Condensed Range**: Capped calling ranges (e.g. BB defend) preserving implied odds.
+- **Mixed Range**: Split-frequency equilibrium plays (e.g. SB RFI vs BB).
 
-- 📊 **13x13 Interactive Grid Matrix**:
-  - Full 169-hand preflop matrix revealed after each play.
-  - Click any matrix hand cell to inspect combo counts (6, 4, 12 combos), GTO action percentages, and morphology notes.
+### 🎯 5. Exploit & Opponent Profiling Engine
+- Toggle between **GTO Standard Equilibrium** and **Exploit Mode**.
+- Practice tactical adjustments against specific villain profiles:
+  - *Tight Nit / Nitty Reg*: Over-fold vs 3-bets, steal aggressively.
+  - *Calling Station*: Remove zero-EV bluffs, value bet wider.
+  - *Maniac / Aggro-3Bettor*: Tighten open range, 4-bet linear premiums.
 
-- 🔍 **Analytics & Positional Leak Detector**:
-  - Tracks positional accuracy across all seats (`UTG`, `HJ`, `CO`, `BTN`, `SB`, `BB`).
-  - **Automated Leak Warning System**: Flags weak seats (<65% accuracy) with a one-click **"Practice This Leak"** drill mode.
-
-- 🔒 **Data Retention & Privacy**:
-  - All user stats, attempt histories, streaks, and leak logs are preserved locally in browser `localStorage` (`gto_preflop_stats`).
-  - Every visitor gets their own private, persistent data store with zero cloud tracking.
+### 📊 6. Analytics & Positional Leak Detector
+- Real-time tracking of positional accuracy across all seats (`UTG`, `HJ`, `CO`, `BTN`, `SB`, `BB`).
+- **Automated Leak Detector**: Flags weak seats (<65% accuracy) with a one-click **"Practice This Leak"** drill mode.
+- Local browser data persistence via `localStorage` (`gto_preflop_stats`) with zero server tracking.
 
 ---
 
-## 💾 How Data Retention Works
+## ⌨️ Keyboard Shortcuts
+
+| Key | Action |
+|---|---|
+| <kbd>1</kbd> | Action: **Fold** |
+| <kbd>2</kbd> | Action: **Call** |
+| <kbd>3</kbd> | Action: **Raise / 3-Bet** |
+| <kbd>H</kbd> | Toggle **GTO Solution Hint** |
+| <kbd>Space</kbd> / <kbd>Enter</kbd> | Deal **Next Hand** |
+
+---
+
+## 💾 Data Retention & Privacy
 
 1. **Local Browser Isolation**:
-   Your progress (total attempts, accuracy %, current streak, positional leaks, and hand history) is stored directly in your browser's `window.localStorage`. 
+   Progress (attempts, accuracy %, streaks, leak history) is stored directly in your browser's `window.localStorage`.
 2. **Multi-Session Continuity**:
-   You can close the tab or browser anytime and return days later — your statistics, best streak, and leak history will automatically reload.
+   Data automatically reloads across sessions — close the browser anytime and resume where you left off.
 3. **Privacy-First**:
-   No login, account creation, or server tracking is required. Each browser/device maintains its own isolated data set. Data is cleared automatically after 365 days of inactivity.
+   Zero login, registration, or cloud tracking required.
 
 ---
 
-## 🚀 Deployment & Local Setup
+## 🚀 Local Setup & Deployment
 
-### Live GitHub Pages Deployment
-Automated GitHub Actions CI/CD workflow (`.github/workflows/deploy.yml`) deploys to GitHub Pages on every push to `main`.
+### Run Locally
 
-### Running Locally
 ```bash
 # 1. Install dependencies
 npm install
@@ -73,10 +94,13 @@ npm install
 # 2. Start local development server
 npm run dev
 
-# 3. Build & test production bundle
+# 3. Build & preview production bundle
 npm run build
 npm run preview
 ```
+
+### GitHub Pages Deployment
+Automated CI/CD via `.github/workflows/deploy.yml` deploys to GitHub Pages on every push to `main`.
 
 ---
 
